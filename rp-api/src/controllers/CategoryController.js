@@ -6,7 +6,13 @@ export async function index(req, res) {
   try {
     const categories = await Category.findAll({
       where: { status_id: 1 },
-      include: ["status"],
+      include: [
+        {
+          association: "user",
+          attributes: { exclude: ["password"] },
+        },
+        "status",
+      ],
     });
     res.json(categories);
   } catch (error) {
@@ -17,7 +23,13 @@ export async function index(req, res) {
 export async function show(req, res, next) {
   try {
     const category = await Category.findByPk(req.params.id, {
-      include: ["status"],
+      include: [
+        {
+          association: "user",
+          attributes: { exclude: ["password"] },
+        },
+        "status",
+      ],
     });
     if (!category || category.status_id === 2) {
       throw { message: "Category not found", status: 404 };

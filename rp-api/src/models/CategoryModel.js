@@ -1,6 +1,8 @@
 import { sequelize } from "../libs/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import { Status } from "./StatusModel.js";
+import { User } from "./UserModel.js";
+
 export class Category extends Model {
   static async create(product) {
     try {
@@ -56,6 +58,18 @@ Category.init(
     status_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: "status",
+        key: "id",
+      },
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
     },
   },
   {
@@ -66,5 +80,11 @@ Category.init(
 );
 
 Category.belongsTo(Status, {
-  foreignKey: "status_id", as: "status"
+  foreignKey: "status_id",
+  as: "status",
+});
+
+Category.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
 });
