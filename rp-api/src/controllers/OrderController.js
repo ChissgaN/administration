@@ -1,5 +1,5 @@
 import { Order } from "../models/OrderModel.js";
-import { storeSchema, updateSchema } from "../libs/joi/OrdenDetailSchema.js";
+import { storeSchema, updateSchema } from "../libs/joi/OrderSchema.js";
 
 export async function index(req, res, next) {
   try {
@@ -35,9 +35,13 @@ export async function show(req, res, next) {
 
 export async function store(req, res, next) {
   try {
-    await storeSchema.validateAsync(req.body);
-    await Order.create(req.body);
-    res.json({ message: "Orden Detail created successfully" });
+    const { body } = req;
+    await storeSchema.validateAsync(body);
+    await Order.create({
+      ...body,
+      order_details: JSON.stringify(body.order_details),
+    });
+    res.json({ message: "Order created successfully" });
   } catch (error) {
     next(error);
   }
@@ -69,4 +73,4 @@ export async function remove(req, res, next) {
   }
 }
 
-export default { index, store, update, remove };
+export default { index, show, store, update, remove };

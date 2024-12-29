@@ -3,8 +3,29 @@ import { DataTypes, Model } from "sequelize";
 import { Status } from "./StatusModel.js";
 import { User } from "./UserModel.js";
 import { OrderDetail } from "./OrderDetailModel.js";
-export class Order extends Model {}
 
+export class Order extends Model {
+  
+  static async create(order) {
+
+    try {
+      let query = "EXEC sp_register_order";
+
+      query += Object.keys(order)
+        .map((key) => ` @${key}=:${key}`)
+        .join(",");
+
+      const request = await sequelize.query(query, {
+        replacements: order,
+        type: sequelize.QueryTypes.RAW,
+      });
+
+      return request;
+    } catch (error) {
+      throw error;
+    }
+  }
+}
 
 Order.init(
   {
