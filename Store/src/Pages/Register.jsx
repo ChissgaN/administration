@@ -176,14 +176,14 @@ const Register = () => {
                 Rol
               </label>
               <select
-                className={`w-full rounded-lg border px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 ${
+                className={`w-full rounded-lg border px-4 py-4 text-sm shadow-sm focus:outline-none focus:ring-2 ${
                   errors.role
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-300 focus:ring-blue-600"
                 }`}
                 {...register("role")}
               >
-                <option value="">Seleccionar Rol</option>
+                <option disabled value="">Seleccionar Rol</option>
                 <option value="1">Operador</option>
                 <option value="2">Cliente</option>
               </select>
