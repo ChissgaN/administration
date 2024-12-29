@@ -20,6 +20,7 @@ const schema = yup.object().shape({
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // Para manejar mensajes de error de la API
 
   const {
     register,
@@ -27,13 +28,26 @@ const Login = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-    mode: "onChange", 
-    reValidateMode: "onChange", 
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
 
-  const onSubmit = (data) => {
-    console.log("Datos enviados:", data);
-  };
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch("http://localhost:5173/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#CBE896]">
@@ -45,6 +59,7 @@ const Login = () => {
         <h1 className="mb-6 text-center text-2xl font-semibold text-gray-700">
           Inicio de Sesión
         </h1>
+
         {/* Formulario */}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="mb-4">
@@ -85,6 +100,11 @@ const Login = () => {
               <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
             )}
           </div>
+
+          {/* Mostrar mensaje de error de la API */}
+          {errorMessage && (
+            <p className="mb-4 text-sm text-red-500">{errorMessage}</p>
+          )}
 
           <button
             type="submit"
