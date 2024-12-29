@@ -9,6 +9,7 @@ export const appConfig = {
   env: process.env.APP_ENV,
   host: process.env.APP_HOST,
   name: process.env.APP_NAME,
+  cors: process.env.APP_CORS_ORIGINS,
 };
 
 export default appConfig;

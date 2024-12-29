@@ -1,12 +1,16 @@
-import ProductsModel from "../models/ProductModel.js";
+import { Product } from "../models/ProductModel.js";
 import { storeSchema, updateSchema } from "../libs/joi/ProductsSchema.js";
 import { unlinkFile } from "../helpers/UnlinkFile.js";
 import joi from "joi";
+import { Status } from "../models/StatusModel.js";
 
 export async function index(req, res, next) {
   try {
-    const products = await ProductsModel.select();
-    res.json({ products });
+    const products = await Product.findAll({
+      where: { status_id: 1 },
+      include: ["category","status"],
+    });
+    res.json(products);
   } catch (error) {
     next(error);
   }
@@ -14,8 +18,11 @@ export async function index(req, res, next) {
 
 export async function show(req, res, next) {
   try {
-    const product = await ProductsModel.find(req.params.id);
-    if (!product) {
+    const product = await Product.findByPk(req.params.id, {
+      include: ["category","status"],
+    });
+
+    if (!product || product.status_id === 2) {
       throw { message: "Product not found", status: 404 };
     }
     res.json(product);
@@ -29,7 +36,7 @@ export async function store(req, res, next) {
     const user_id = req.auth.id;
     const photo = req?.file?.path;
     await storeSchema.validateAsync(req.body);
-    await ProductsModel.create({ ...req.body, user_id, photo });
+    await Product.create({ ...req.body, user_id, photo });
     res.json({ message: "Product created successfully" });
   } catch (error) {
     unlinkFile(req.file.path);
@@ -74,11 +81,11 @@ export async function update(req, res, next) {
 
 export async function remove(req, res, next) {
   try {
-    const product = await ProductsModel.find(req.params.id);
+    const product = await Product.findByPk(req.params.id);
     if (!product) {
       throw { message: "Product not found", status: 404 };
     }
-    await ProductsModel.remove(2, req.params.id);
+    await Product.remove(2, req.params.id);
     res.json({ message: "Product removed successfully" });
   } catch (error) {
     next(error);

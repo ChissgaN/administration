@@ -1,10 +1,16 @@
 import express from "express";
+import cors from "cors";
 import path from "path";
 import routes from "./routes/index.js";
 import appConfig from "./config/app_config.js";
 import { ErrorHandler, LogError } from "./middlewares/ErrorsHandler.js";
-
+console.log(typeof appConfig.cors);
 const app = express();
+app.use(
+  cors({
+    origin: appConfig.cors,
+  })
+);
 
 app.use(express.json());
 
