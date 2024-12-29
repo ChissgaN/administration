@@ -6,6 +6,7 @@ import { user_router } from "./UserRouter.js";
 import { orden_detail_router } from "./OrdenDetailRouter.js";
 import { client_router } from "./ClientRouter.js";
 import { auth_router } from "./AuthRouter.js";
+import { role_router } from "./RoleRouter.js";
 
 import auth from "../middlewares/Auth.js";
 
@@ -23,6 +24,7 @@ export function routes(app) {
   app_router.use("/products", auth, product_router);
   app_router.use("/categories", auth, category_router);
   app_router.use("/status", auth, status_router);
+  app_router.use("/roles", auth, role_router);
   app_router.use("/users", auth, user_router);
   app_router.use("/orden_details", auth, orden_detail_router);
   app_router.use("/client", auth, client_router);
