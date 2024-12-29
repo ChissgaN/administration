@@ -5,9 +5,7 @@ Dependecies: multer, express, dotenv, boom, joi, jwt, bcrypt
 
 #Create order espected data example
 {
-    "user_id": 1,
     "status_id": 1,
-    "client_id": 1,
     "full_name": "John Doe",
     "address": "123 Main St",
     "phone_number": "123-456-7890",
