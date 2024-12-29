@@ -14,7 +14,8 @@ export const storeSchema = joi.object({
 });
 
 export const updateSchema = joi.object({
-  quantity: joi.number().required(),
-  subtotal: joi.number().required(),
-  total_order: joi.number().required(),
+  full_name: joi.string().max(45).required(),
+  address: joi.string().max(245).required(),
+  phone_number: joi.string().max(45).required(),
+  email: joi.string().email().required(),
 });

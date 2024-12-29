@@ -109,7 +109,7 @@ DROP TABLE [order]
 CREATE TABLE [order]
 (
     id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT NULL,
     status_id INT NOT NULL,
     client_id INT NOT NULL,
     full_name VARCHAR(45) NOT NULL,
@@ -579,12 +579,12 @@ BEGIN
 END
 GO
 
- DROP PROCEDURE IF EXISTS sp_register_order;
+
+DROP PROCEDURE IF EXISTS sp_register_order;
 GO
 
 -- Create the stored procedure
 CREATE PROCEDURE sp_register_order
-    @user_id INT,
     @client_id INT,
     @status_id INT,
     @full_name VARCHAR(45),
@@ -603,9 +603,9 @@ BEGIN
 
         -- Insert into [order] table
         INSERT INTO [order]
-        (user_id, client_id, status_id, full_name, address, phone_number, email, delivery_date, total_order)
+        (client_id, status_id, full_name, address, phone_number, email, delivery_date, total_order)
     VALUES
-        (@user_id, @client_id, @status_id, @full_name, @address, @phone_number, @email, @delivery_date, @total_order);
+        (@client_id, @status_id, @full_name, @address, @phone_number, @email, @delivery_date, @total_order);
 
         -- Get the newly inserted order_id
         SET @order_id = SCOPE_IDENTITY();
@@ -629,6 +629,7 @@ BEGIN
     END CATCH
 END;
 GO
+
 
 
 -- Create a new stored procedure called 'sp_update_order_info' in schema 'SchemaName'
