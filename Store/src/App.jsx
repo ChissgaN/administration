@@ -4,22 +4,20 @@ import './App.css'
 import Login from './Pages/Login';
 import Register from './Pages/Register';
 import AuthLayout from './Layouts/AuthLayout';
+import { ClassNames } from '@emotion/react';
 
 function App() {
 
   return (
-    <>
+    <div className='bg-[#fffffc] min-h-screen'>
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route
-          path="/inicio"
-          element={ <AuthLayout /> }
-        />
+        <Route path="/inicio" element={<AuthLayout />} />
       </Routes>
     </Router>
-    </>
+    </div>
   )
 }
 
