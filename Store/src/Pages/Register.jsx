@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import GuestLayout from "../Layouts/GuestLayout";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -57,6 +58,7 @@ const Register = () => {
   };
 
   return (
+    <GuestLayout>
     <div className="flex min-h-screen items-center justify-center bg-[#CBE896]">
       <div className="w-full max-w-md rounded-lg bg-[#FFFFFC] p-6 shadow-md">
         <h1 className="mb-6 text-center text-2xl font-semibold text-gray-700">
@@ -98,7 +100,7 @@ const Register = () => {
             />
             <button
               type="button"
-              className="absolute top-9 right-3 text-gray-600"
+              className="absolute top-10 right-3 text-gray-600"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
@@ -211,6 +213,7 @@ const Register = () => {
         </p>
       </div>
     </div>
+    </GuestLayout>
   );
 };
 
