@@ -5,8 +5,9 @@ import * as yup from "yup";
 import { AiOutlineShop } from "react-icons/ai";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import GuestLayout from "../Layouts/GuestLayout";
 
-// Esquema de validación con YUP
+// Esquema de validación con YUP 
 const schema = yup.object().shape({
   email: yup
     .string()
@@ -20,7 +21,7 @@ const schema = yup.object().shape({
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // Para manejar mensajes de error de la API
+  const [errorMessage, setErrorMessage] = useState(""); 
 
   const {
     register,
@@ -50,6 +51,7 @@ const Login = () => {
   };
 
   return (
+    <GuestLayout>
     <div className="flex min-h-screen items-center justify-center bg-[#CBE896]">
       <div className="w-full max-w-md rounded-lg bg-[#FFFFFC] p-6 shadow-md">
         {/* Ícono de tienda centrado */}
@@ -122,6 +124,7 @@ const Login = () => {
         </p>
       </div>
     </div>
+    </GuestLayout>
   );
 };
 
