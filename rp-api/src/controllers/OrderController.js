@@ -82,8 +82,9 @@ export async function update(req, res, next) {
 
 export async function remove(req, res, next) {
   try {
+    const { role } = req.auth;
     const orden_detail = await Order.find(req.params.id);
-    if (!orden_detail) {
+    if (!orden_detail || (role.id === 2 && orden_detail.client_id !== req.auth.id)) {
       throw { message: "Orden Detail not found", status: 404 };
     }
     await Order.remove(1, req.params.id);

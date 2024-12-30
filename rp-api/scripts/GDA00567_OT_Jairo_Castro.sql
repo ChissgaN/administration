@@ -49,11 +49,13 @@ DROP TABLE clients
 CREATE TABLE clients
 (
     id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    user_id INT NOT NULL,
     social_reason VARCHAR(245) NOT NULL,
     comertial_name VARCHAR(245) NOT NULL,
     delivery_address VARCHAR(45) NOT NULL,
     phone_number VARCHAR(45) NOT NULL,
     email VARCHAR(45) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
 );
 GO
 
@@ -173,108 +175,318 @@ GO
 
 -- insert data into tables
 
-Insert into status (name) values ('Activo'), ('Inactivo'), ('Pendiente'), ('Entregado'), ('Cancelado');
+Insert into status
+    (name)
+values
+    ('Activo'),
+    ('Inactivo'),
+    ('Pendiente'),
+    ('Entregado'),
+    ('Cancelado');
 GO
 
-insert into role (name) values ('Administrador'), ('Vendedor');
+insert into role
+    (name)
+values
+    ('Administrador'),
+    ('Vendedor');
 GO
-INSERT INTO clients (social_reason, comertial_name, delivery_address, phone_number, email) VALUES ('Jairo Castro', 'Jairo Castro', 'Guatemala', '12345678', 'jc@test.com'), ('Juan Perez', 'Juan Perez', 'Guatemala', '12345678', 'jp@mail.com'),('Maria Lopez', 'Maria Lopez', 'Guatemala', '12345678', 'ml@mail.com'), ('Pedro Ramirez', 'Pedro Ramirez', 'Guatemala', '12345678', 'pr@mail.com');
-GO
-
-INSERT INTO users (role_id, status_id, email, password, phone_number, birth_date) VALUES (1, 1, 'jj@mail.com', '1234567', '12345678', '1990-01-01'), (2, 1, 'jc@mail.com', '1234567', '12345678', '1990-01-01'),(2, 1, 'mr@start.com', '1234567', '12345678', '1990-01-01'), (2, 1, 'miso@pato.com', '1234567', '12345678', '1990-01-01');
-GO
-
-INSERT INTO products_categories (user_id, status_id, name) VALUES (1, 1, 'Electrodomesticos'), (1, 1, 'Ropa'), (1, 1, 'Zapatos'), (1, 1, 'Accesorios');
-GO
-
-INSERT INTO [order](user_id, status_id, client_id, full_name, address, phone_number, email, delivery_date, total_order, creation_date) 
-VALUES 
-(4, 5, 3, 'Clovis Gallo', 'PO Box 13454', '215-643-1384', 'cgallo0@time.com', '2022-11-09', 6565.92, '2024-09-22T00:06:09'),
-(4, 4, 1, 'Harp Errichelli', 'Suite 24', '431-713-4974', 'herrichelli1@about.me', '2022-11-14', 1035.04, '2024-12-05T17:56:30'),
-(2, 5, 3, 'Jena Benning', 'Apt 869', '251-213-5584', 'jbenning2@youku.com', '2022-06-21', 460.28, '2024-05-16T11:24:48'),
-(3, 4, 2, 'Bekki Andover', 'Suite 97', '855-337-4469', 'bandover3@hatena.ne.jp', '2022-11-24', 5762.57, '2024-07-13T12:11:58'),
-(3, 3, 3, 'Cory Mitrikhin', 'Suite 82', '771-232-0889', 'cmitrikhin4@phpbb.com', '2022-12-11', 5686.53, '2024-09-19T21:22:16'),
-(1, 5, 2, 'Alvina Maylour', 'Apt 326', '667-891-2384', 'amaylour5@sciencedaily.com', '2022-03-25', 7803.63, '2024-08-08T03:52:43'),
-(4, 4, 4, 'Krysta Springate', 'Apt 6', '611-663-5491', 'kspringate6@twitter.com', '2022-01-25', 5139.47, '2024-06-09T04:42:23'),
-(3, 5, 1, 'Nicolas Moylan', 'Apt 829', '288-777-3172', 'nmoylan7@pen.io', '2022-02-27', 3153.75, '2024-05-19T18:12:01'),
-(1, 3, 4, 'Charmian Madison', 'Room 1800', '721-534-4857', 'cmadison8@buzzfeed.com', '2022-10-09', 6365.14, '2024-11-30T11:05:21'),
-(3, 5, 4, 'Evyn Longfield', '13th Floor', '834-123-9374', 'elongfield9@oracle.com', '2022-09-08', 6037.85, '2024-02-13T23:51:59'),
-(4, 3, 1, 'Richard Glaserman', 'Room 1485', '432-413-4006', 'rglasermana@naver.com', '2022-07-29', 3163.77, '2024-10-24T15:32:45'),
-(3, 3, 1, 'Sophie Cast', 'Room 375', '165-787-9564', 'scastb@sciencedirect.com', '2022-12-11', 4648.98, '2024-08-07T17:18:15'),
-(2, 4, 2, 'Karola Kelinge', 'Apt 418', '342-595-2897', 'kkelingec@china.com.cn', '2022-09-21', 834.83, '2024-07-10T14:31:14'),
-(3, 5, 3, 'Gert Gilloran', '10th Floor', '141-827-3211', 'ggillorand@europa.eu', '2022-01-19', 2868.6, '2024-09-30T02:54:03'),
-(3, 3, 1, 'Krispin Endecott', '5th Floor', '710-918-2115', 'kendecotte@addthis.com', '2022-10-15', 4059.49, '2024-10-31T01:33:21'),
-(3, 3, 2, 'Irvine Ind', 'Room 731', '818-912-5196', 'iindf@unicef.org', '2022-10-18', 241.24, '2024-10-01T18:52:56'),
-(1, 5, 1, 'Noni Sailor', 'Suite 15', '516-992-5213', 'nsailorg@gnu.org', '2022-05-04', 1211.01, '2024-05-07T23:55:35'),
-(3, 3, 2, 'Oates Poag', 'Room 1661', '323-869-3536', 'opoagh@blogspot.com', '2022-02-08', 6406.76, '2024-01-28T07:32:48'),
-(1, 5, 3, 'Katusha Lunnon', 'Apt 257', '727-756-2801', 'klunnoni@wunderground.com', '2022-07-07', 9244.91, '2024-01-26T17:52:51'),
-(3, 5, 2, 'Falkner Molyneux', 'Suite 33', '741-713-6491', 'fmolyneuxj@opera.com', '2022-06-05', 8110.57, '2024-04-21T22:48:56');
+INSERT INTO clients
+    (social_reason, comertial_name, delivery_address, phone_number, email)
+VALUES
+    ('Jairo Castro', 'Jairo Castro', 'Guatemala', '12345678', 'jc@test.com'),
+    ('Juan Perez', 'Juan Perez', 'Guatemala', '12345678', 'jp@mail.com'),
+    ('Maria Lopez', 'Maria Lopez', 'Guatemala', '12345678', 'ml@mail.com'),
+    ('Pedro Ramirez', 'Pedro Ramirez', 'Guatemala', '12345678', 'pr@mail.com');
 GO
 
+INSERT INTO users
+    (role_id, status_id, email, password, phone_number, birth_date)
+VALUES
+    (1, 1, 'jj@mail.com', '1234567', '12345678', '1990-01-01'),
+    (2, 1, 'jc@mail.com', '1234567', '12345678', '1990-01-01'),
+    (2, 1, 'mr@start.com', '1234567', '12345678', '1990-01-01'),
+    (2, 1, 'miso@pato.com', '1234567', '12345678', '1990-01-01');
+GO
 
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (3, 2, 'non', 'non', 'LSZ', 86, 2, 621.13, 'venenatis', '2/18/2022');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (2, 4, 'justo', 'ac', 'TPX', 21, 2, 7.72, 'sed accumsan felis', '6/6/2013');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (3, 2, 'sagittis', 'eget', 'CFD', 47, 1, 721.53, 'auctor gravida', '4/25/2003');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (4, 4, 'tempor', 'lectus', 'FDR', 62, 1, 710.96, 'posuere cubilia curae', '11/8/2001');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (3, 0, 'integer', 'lorem', 'MJL', 35, 1, 802.92, 'duis bibendum morbi', '4/25/2009');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (1, 4, 'adipiscing', 'sit', 'YKZ', 21, 2, 1184.25, 'duis consequat', '11/2/2001');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (0, 0, 'vel', 'potenti', 'KHM', 29, 1, 901.85, 'hac habitasse', '1/27/2007');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (4, 4, 'enim', 'nisi', 'VAI', 14, 2, 1164.56, 'ac', '11/21/2021');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (1, 4, 'tempus', 'sagittis', 'YRO', 41, 2, 906.67, 'sed sagittis nam', '4/26/2017');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (2, 2, 'id', 'dapibus', 'ZRH', 98, 2, 943.63, 'mattis nibh', '1/3/2015');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (3, 2, 'odio', 'imperdiet', 'KIP', 31, 1, 192.46, 'erat', '2/20/2008');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (2, 1, 'quis', 'sem', 'WIR', 71, 2, 591.43, 'lacus', '9/29/2024');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (2, 4, 'porta', 'nec', 'DVP', 65, 2, 469.95, 'luctus tincidunt', '10/15/2008');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (3, 1, 'aliquam', 'at', 'BJD', 46, 2, 759.35, 'duis', '1/9/2013');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (3, 3, 'eros', 'est', 'PTJ', 43, 2, 68.77, 'lacus at velit', '6/29/2015');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (1, 0, 'quam', 'velit', 'FBU', 52, 1, 929.94, 'dis parturient montes', '12/26/2012');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (3, 2, 'lorem', 'justo', 'WTE', 93, 2, 590.72, 'ut massa', '4/28/2023');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (4, 0, 'sed', 'ante', 'BGX', 69, 1, 552.63, 'integer aliquet', '5/3/2017');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (0, 0, 'a', 'vestibulum', 'CON', 5, 2, 740.09, 'integer', '8/21/2021');
-insert into products (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date) values (0, 0, 'potenti', 'integer', 'PJG', 80, 2, 354.75, 'ultrices posuere cubilia', '2/12/2015');
+INSERT INTO products_categories
+    (user_id, status_id, name)
+VALUES
+    (1, 1, 'Electrodomesticos'),
+    (1, 1, 'Ropa'),
+    (1, 1, 'Zapatos'),
+    (1, 1, 'Accesorios');
+GO
+
+INSERT INTO [order]
+    (user_id, status_id, client_id, full_name, address, phone_number, email, delivery_date, total_order, creation_date)
+VALUES
+    (4, 5, 3, 'Clovis Gallo', 'PO Box 13454', '215-643-1384', 'cgallo0@time.com', '2022-11-09', 6565.92, '2024-09-22T00:06:09'),
+    (4, 4, 1, 'Harp Errichelli', 'Suite 24', '431-713-4974', 'herrichelli1@about.me', '2022-11-14', 1035.04, '2024-12-05T17:56:30'),
+    (2, 5, 3, 'Jena Benning', 'Apt 869', '251-213-5584', 'jbenning2@youku.com', '2022-06-21', 460.28, '2024-05-16T11:24:48'),
+    (3, 4, 2, 'Bekki Andover', 'Suite 97', '855-337-4469', 'bandover3@hatena.ne.jp', '2022-11-24', 5762.57, '2024-07-13T12:11:58'),
+    (3, 3, 3, 'Cory Mitrikhin', 'Suite 82', '771-232-0889', 'cmitrikhin4@phpbb.com', '2022-12-11', 5686.53, '2024-09-19T21:22:16'),
+    (1, 5, 2, 'Alvina Maylour', 'Apt 326', '667-891-2384', 'amaylour5@sciencedaily.com', '2022-03-25', 7803.63, '2024-08-08T03:52:43'),
+    (4, 4, 4, 'Krysta Springate', 'Apt 6', '611-663-5491', 'kspringate6@twitter.com', '2022-01-25', 5139.47, '2024-06-09T04:42:23'),
+    (3, 5, 1, 'Nicolas Moylan', 'Apt 829', '288-777-3172', 'nmoylan7@pen.io', '2022-02-27', 3153.75, '2024-05-19T18:12:01'),
+    (1, 3, 4, 'Charmian Madison', 'Room 1800', '721-534-4857', 'cmadison8@buzzfeed.com', '2022-10-09', 6365.14, '2024-11-30T11:05:21'),
+    (3, 5, 4, 'Evyn Longfield', '13th Floor', '834-123-9374', 'elongfield9@oracle.com', '2022-09-08', 6037.85, '2024-02-13T23:51:59'),
+    (4, 3, 1, 'Richard Glaserman', 'Room 1485', '432-413-4006', 'rglasermana@naver.com', '2022-07-29', 3163.77, '2024-10-24T15:32:45'),
+    (3, 3, 1, 'Sophie Cast', 'Room 375', '165-787-9564', 'scastb@sciencedirect.com', '2022-12-11', 4648.98, '2024-08-07T17:18:15'),
+    (2, 4, 2, 'Karola Kelinge', 'Apt 418', '342-595-2897', 'kkelingec@china.com.cn', '2022-09-21', 834.83, '2024-07-10T14:31:14'),
+    (3, 5, 3, 'Gert Gilloran', '10th Floor', '141-827-3211', 'ggillorand@europa.eu', '2022-01-19', 2868.6, '2024-09-30T02:54:03'),
+    (3, 3, 1, 'Krispin Endecott', '5th Floor', '710-918-2115', 'kendecotte@addthis.com', '2022-10-15', 4059.49, '2024-10-31T01:33:21'),
+    (3, 3, 2, 'Irvine Ind', 'Room 731', '818-912-5196', 'iindf@unicef.org', '2022-10-18', 241.24, '2024-10-01T18:52:56'),
+    (1, 5, 1, 'Noni Sailor', 'Suite 15', '516-992-5213', 'nsailorg@gnu.org', '2022-05-04', 1211.01, '2024-05-07T23:55:35'),
+    (3, 3, 2, 'Oates Poag', 'Room 1661', '323-869-3536', 'opoagh@blogspot.com', '2022-02-08', 6406.76, '2024-01-28T07:32:48'),
+    (1, 5, 3, 'Katusha Lunnon', 'Apt 257', '727-756-2801', 'klunnoni@wunderground.com', '2022-07-07', 9244.91, '2024-01-26T17:52:51'),
+    (3, 5, 2, 'Falkner Molyneux', 'Suite 33', '741-713-6491', 'fmolyneuxj@opera.com', '2022-06-05', 8110.57, '2024-04-21T22:48:56');
 GO
 
 
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (13, 7, 9, 285.86, 6005.73);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (9, 4, 4, 746.18, 9134.67);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (10, 18, 7, 276.04, 9485.18);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (6, 19, 3, 578.2, 4076.92);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (17, 9, 8, 902.28, 2144.84);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (3, 4, 5, 663.52, 1017.23);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (3, 13, 4, 236.5, 4252.62);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (18, 9, 2, 28.16, 9493.39);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (5, 7, 9, 116.26, 1052.83);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (19, 1, 3, 900.71, 9118.9);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (2, 13, 4, 655.51, 4828.89);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (14, 2, 2, 223.41, 5813.38);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (10, 7, 7, 977.0, 4017.88);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (8, 18, 1, 922.13, 8326.42);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (16, 2, 5, 769.08, 2537.73);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (12, 11, 6, 546.19, 9744.43);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (2, 2, 3, 379.3, 6361.23);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (8, 3, 5, 285.5, 6110.76);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (13, 20, 6, 526.78, 2873.66);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (8, 15, 7, 235.73, 6636.92);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (9, 15, 10, 747.38, 5742.64);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (14, 2, 5, 461.68, 1665.83);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (15, 17, 9, 381.9, 6411.91);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (5, 15, 3, 472.31, 2808.56);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (6, 4, 6, 525.05, 3255.94);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (13, 3, 1, 768.34, 9667.17);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (17, 12, 10, 547.77, 6608.95);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (12, 18, 6, 64.94, 9798.94);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (10, 19, 1, 855.39, 8857.64);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (10, 16, 5, 235.08, 823.2);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (20, 2, 1, 379.07, 5347.48);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (17, 3, 2, 425.58, 4465.79);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (1, 8, 9, 491.65, 4729.21);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (8, 17, 6, 508.33, 8246.57);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (8, 8, 8, 523.07, 6391.09);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (13, 3, 1, 12.88, 1400.04);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (14, 10, 5, 885.56, 4392.32);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (9, 14, 9, 848.34, 5441.37);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (5, 8, 6, 392.4, 1658.74);
-insert into order_details (order_id, products_id, quantity, price, subtotal) values (18, 12, 7, 224.92, 3421.91);
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (3, 2, 'non', 'non', 'LSZ', 86, 2, 621.13, 'venenatis', '2/18/2022');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (2, 4, 'justo', 'ac', 'TPX', 21, 2, 7.72, 'sed accumsan felis', '6/6/2013');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (3, 2, 'sagittis', 'eget', 'CFD', 47, 1, 721.53, 'auctor gravida', '4/25/2003');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (4, 4, 'tempor', 'lectus', 'FDR', 62, 1, 710.96, 'posuere cubilia curae', '11/8/2001');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (3, 0, 'integer', 'lorem', 'MJL', 35, 1, 802.92, 'duis bibendum morbi', '4/25/2009');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (1, 4, 'adipiscing', 'sit', 'YKZ', 21, 2, 1184.25, 'duis consequat', '11/2/2001');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (0, 0, 'vel', 'potenti', 'KHM', 29, 1, 901.85, 'hac habitasse', '1/27/2007');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (4, 4, 'enim', 'nisi', 'VAI', 14, 2, 1164.56, 'ac', '11/21/2021');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (1, 4, 'tempus', 'sagittis', 'YRO', 41, 2, 906.67, 'sed sagittis nam', '4/26/2017');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (2, 2, 'id', 'dapibus', 'ZRH', 98, 2, 943.63, 'mattis nibh', '1/3/2015');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (3, 2, 'odio', 'imperdiet', 'KIP', 31, 1, 192.46, 'erat', '2/20/2008');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (2, 1, 'quis', 'sem', 'WIR', 71, 2, 591.43, 'lacus', '9/29/2024');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (2, 4, 'porta', 'nec', 'DVP', 65, 2, 469.95, 'luctus tincidunt', '10/15/2008');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (3, 1, 'aliquam', 'at', 'BJD', 46, 2, 759.35, 'duis', '1/9/2013');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (3, 3, 'eros', 'est', 'PTJ', 43, 2, 68.77, 'lacus at velit', '6/29/2015');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (1, 0, 'quam', 'velit', 'FBU', 52, 1, 929.94, 'dis parturient montes', '12/26/2012');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (3, 2, 'lorem', 'justo', 'WTE', 93, 2, 590.72, 'ut massa', '4/28/2023');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (4, 0, 'sed', 'ante', 'BGX', 69, 1, 552.63, 'integer aliquet', '5/3/2017');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (0, 0, 'a', 'vestibulum', 'CON', 5, 2, 740.09, 'integer', '8/21/2021');
+insert into products
+    (products_categories_id, user_id, name, brand, code, stock, status_id, price, photo, creation_date)
+values
+    (0, 0, 'potenti', 'integer', 'PJG', 80, 2, 354.75, 'ultrices posuere cubilia', '2/12/2015');
+GO
+
+
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (13, 7, 9, 285.86, 6005.73);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (9, 4, 4, 746.18, 9134.67);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (10, 18, 7, 276.04, 9485.18);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (6, 19, 3, 578.2, 4076.92);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (17, 9, 8, 902.28, 2144.84);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (3, 4, 5, 663.52, 1017.23);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (3, 13, 4, 236.5, 4252.62);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (18, 9, 2, 28.16, 9493.39);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (5, 7, 9, 116.26, 1052.83);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (19, 1, 3, 900.71, 9118.9);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (2, 13, 4, 655.51, 4828.89);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (14, 2, 2, 223.41, 5813.38);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (10, 7, 7, 977.0, 4017.88);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (8, 18, 1, 922.13, 8326.42);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (16, 2, 5, 769.08, 2537.73);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (12, 11, 6, 546.19, 9744.43);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (2, 2, 3, 379.3, 6361.23);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (8, 3, 5, 285.5, 6110.76);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (13, 20, 6, 526.78, 2873.66);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (8, 15, 7, 235.73, 6636.92);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (9, 15, 10, 747.38, 5742.64);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (14, 2, 5, 461.68, 1665.83);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (15, 17, 9, 381.9, 6411.91);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (5, 15, 3, 472.31, 2808.56);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (6, 4, 6, 525.05, 3255.94);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (13, 3, 1, 768.34, 9667.17);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (17, 12, 10, 547.77, 6608.95);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (12, 18, 6, 64.94, 9798.94);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (10, 19, 1, 855.39, 8857.64);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (10, 16, 5, 235.08, 823.2);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (20, 2, 1, 379.07, 5347.48);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (17, 3, 2, 425.58, 4465.79);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (1, 8, 9, 491.65, 4729.21);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (8, 17, 6, 508.33, 8246.57);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (8, 8, 8, 523.07, 6391.09);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (13, 3, 1, 12.88, 1400.04);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (14, 10, 5, 885.56, 4392.32);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (9, 14, 9, 848.34, 5441.37);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (5, 8, 6, 392.4, 1658.74);
+insert into order_details
+    (order_id, products_id, quantity, price, subtotal)
+values
+    (18, 12, 7, 224.92, 3421.91);
 GO
 
 -- CREATE PROCEDURES
