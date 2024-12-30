@@ -2,6 +2,7 @@ import { sequelize } from "../libs/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import { Status } from "./StatusModel.js";
 import { Category } from "./CategoryModel.js";
+
 export class Product extends Model {
   static async create(product) {
     try {

@@ -109,7 +109,7 @@ DROP TABLE [order]
 CREATE TABLE [order]
 (
     id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT NULL,
     status_id INT NOT NULL,
     client_id INT NOT NULL,
     full_name VARCHAR(45) NOT NULL,
@@ -579,34 +579,58 @@ BEGIN
 END
 GO
 
--- Create a new stored procedure called 'sp_register_order' in schema 'SchemaName'
--- Drop the stored procedure if it already exists
-IF EXISTS (
-SELECT *
-FROM INFORMATION_SCHEMA.ROUTINES
-WHERE SPECIFIC_SCHEMA = N'GDA00567_OT_Jairo_Castro'
-    AND SPECIFIC_NAME = N'sp_register_order'
-)
-DROP PROCEDURE sp_register_order
+
+DROP PROCEDURE IF EXISTS sp_register_order;
 GO
--- Create the stored procedure in the specified schema
+
+-- Create the stored procedure
 CREATE PROCEDURE sp_register_order
-    @user_id INT,
+    @client_id INT,
     @status_id INT,
     @full_name VARCHAR(45),
     @address VARCHAR(245),
     @phone_number VARCHAR(45),
     @email VARCHAR(45),
     @delivery_date DATE,
-    @total_order FLOAT
+    @total_order FLOAT,
+    @order_details NVARCHAR(MAX)
 AS
 BEGIN
-    INSERT INTO [order]
-        (user_id, status_id, full_name, address, phone_number, email, delivery_date, total_order)
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        DECLARE @order_id INT;
+
+        -- Insert into [order] table
+        INSERT INTO [order]
+        (client_id, status_id, full_name, address, phone_number, email, delivery_date, total_order)
     VALUES
-        (@user_id, @status_id, @full_name, @address, @phone_number, @email, @delivery_date, @total_order)
-END
+        (@client_id, @status_id, @full_name, @address, @phone_number, @email, @delivery_date, @total_order);
+
+        -- Get the newly inserted order_id
+        SET @order_id = SCOPE_IDENTITY();
+
+        -- Insert into order_details table using OPENJSON
+        INSERT INTO order_details
+        (order_id, products_id, quantity, price, subtotal)
+    SELECT
+        @order_id AS order_id,
+        JSON_VALUE(value, '$.products_id') AS products_id,
+        JSON_VALUE(value, '$.quantity') AS quantity,
+        JSON_VALUE(value, '$.price') AS price,
+        JSON_VALUE(value, '$.subtotal') AS subtotal
+    FROM OPENJSON(@order_details);
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END;
 GO
+
+
 
 -- Create a new stored procedure called 'sp_update_order_info' in schema 'SchemaName'
 -- Drop the stored procedure if it already exists
@@ -762,32 +786,6 @@ BEGIN
     UPDATE products
     SET status_id = @status_id
     WHERE id = @product_id
-END
-GO
-
--- Create a new stored procedure called 'sp_register_order_details' in schema 'SchemaName'
--- Drop the stored procedure if it already exists
-IF EXISTS (
-SELECT *
-FROM INFORMATION_SCHEMA.ROUTINES
-WHERE SPECIFIC_SCHEMA = N'GDA00567_OT_Jairo_Castro'
-    AND SPECIFIC_NAME = N'sp_register_order_details'
-)
-DROP PROCEDURE sp_register_order_details
-GO
--- Create the stored procedure in the specified schema
-CREATE PROCEDURE sp_register_order_details
-    @order_id INT,
-    @products_id INT,
-    @quantity INT,
-    @price FLOAT,
-    @subtotal FLOAT
-AS
-BEGIN
-    INSERT INTO order_details
-        (order_id, products_id, quantity, price, subtotal)
-    VALUES
-        (@order_id, @products_id, @quantity, @price, @subtotal)
 END
 GO
 
