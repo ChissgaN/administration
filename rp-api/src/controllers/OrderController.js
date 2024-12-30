@@ -80,17 +80,22 @@ export async function update(req, res, next) {
   }
 }
 
-export async function remove(req, res, next) {
+export async function updateStatus(req, res, next) {
   try {
+    const { role } = req.auth;
     const orden_detail = await Order.find(req.params.id);
-    if (!orden_detail) {
-      throw { message: "Orden Detail not found", status: 404 };
+    if (
+      !orden_detail ||
+      (role.id === 2 && orden_detail.client_id !== req.auth.id)
+    ) {
+      throw { message: "Order not found", status: 404 };
     }
-    await Order.remove(1, req.params.id);
-    res.json({ message: "Orden Detail removed successfully" });
+    role.id === 2 && (req.body.status_id = 5);
+    await Order.orderStatus(req.body.status_id, req.params.id);
+    res.json({ message: "Order removed successfully" });
   } catch (error) {
     next(error);
   }
 }
 
-export default { index, show, store, update, remove };
+export default { index, show, store, update, updateStatus };
