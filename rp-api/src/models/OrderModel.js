@@ -5,7 +5,6 @@ import { User } from "./UserModel.js";
 import { OrderDetail } from "./OrderDetailModel.js";
 
 export class Order extends Model {
-
   static async create(order) {
     try {
       let query = "EXEC sp_register_order";
@@ -44,6 +43,21 @@ export class Order extends Model {
     }
   }
 
+  static async orderStatus(status_id, order_id) {
+    try {
+      let query =
+        "EXEC sp_update_order_status @status_id=:status_id, @order_id=:order_id";
+
+      const request = await sequelize.query(query, {
+        replacements: { status_id, order_id },
+        type: sequelize.QueryTypes.RAW,
+      });
+
+      return request;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 Order.init(
