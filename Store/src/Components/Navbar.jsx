@@ -29,17 +29,12 @@ const Navbar = ({ rol_id }) => {
         </Link>
 
         {/* Opciones del navbar (pantallas grandes) */}
-        <ul className="hidden sm:flex gap-6 text-[#19535f] font-medium">
+        <ul className="hidden sm:flex gap-8 text-[#19535f] font-medium">
           {rol_id === 1 ? (
             <>
               <li>
                 <Link to="/inicio" className="hover:text-[#ff7f11] transition">
                   Inicio
-                </Link>
-              </li>
-              <li>
-                <Link to="/historial-ordenes" className="hover:text-[#ff7f11] transition">
-                  Historial de Ordenes
                 </Link>
               </li>
               <li>
@@ -106,7 +101,7 @@ const Navbar = ({ rol_id }) => {
       {/* Menú desplegable móvil */}
       {menuOpen && (
         <div className="sm:hidden bg-[#fffffc] py-2 shadow-md">
-          <ul className="flex flex-col gap-4 text-[#19535f] font-medium px-4">
+          <ul className="flex flex-col gap-6 text-[#19535f] font-medium px-4">
             {rol_id === 1 ? (
               <>
                 <li>
@@ -116,15 +111,6 @@ const Navbar = ({ rol_id }) => {
                     onClick={toggleMobileMenu}
                   >
                     Inicio
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/historial-ordenes"
-                    className="hover:text-[#ff7f11] transition"
-                    onClick={toggleMobileMenu}
-                  >
-                    Historial de Ordenes
                   </Link>
                 </li>
                 <li>

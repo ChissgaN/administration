@@ -1,134 +1,172 @@
 import React, { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TablePagination,
-  IconButton,
-} from "@mui/material";
-import { FaEye, FaEdit } from "react-icons/fa";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
+import { TablePagination } from "@mui/material";
+import OrderDetails from "../Components/OrdenDetails";
 import ActionButtons from "../Components/ActionButtons";
+import { FaEye, FaEdit } from "react-icons/fa";
 
-const CustomTablePaginationActions = ({ count, page, rowsPerPage, onPageChange }) => {
-  const handleBackButtonClick = (event) => {
-    onPageChange(event, page - 1);
-  };
+const orders = [
+  {
+    id: 1,
+    full_name: "Clovis Gallo",
+    address: "PO Box 13454",
+    phone_number: "215-634-1334",
+    email: "cgallo@time.com",
+    delivery_date: "2024-09-21",
+    total_order: 6505.92,
+    status: 1, // Estado inicial: 1 = Pendiente
+    order_details: [
+      {
+        id: 33,
+        product_id: 8,
+        quantity: 9,
+        price: 491.65,
+        subtotal: 4729.21,
+        product: { name: "emin" },
+      },
+      {
+        id: 34,
+        product_id: 9,
+        quantity: 5,
+        price: 355.34,
+        subtotal: 1776.71,
+        product: { name: "nisi" },
+      },
+    ],
+  },
+];
 
-  const handleNextButtonClick = (event) => {
-    onPageChange(event, page + 1);
-  };
-
-  return (
-    <div className="flex items-center">
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        className="text-[#19535f] hover:text-[#cbe896]"
-      >
-        <MdKeyboardArrowLeft />
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        className="text-[#19535f] hover:text-[#cbe896]"
-      >
-        <MdKeyboardArrowRight />
-      </IconButton>
-    </div>
-  );
-};
-
-const OrderHistory = () => {
-  const orders = [
-    { id: 1, full_name: "Juan Pérez", address: "123 Calle Principal", phone_number: "555-1234", email: "juan.perez@example.com", delivery_date: "2024-01-15", total_order: 150.75 },
-    { id: 2, full_name: "María López", address: "456 Avenida Secundaria", phone_number: "555-5678", email: "maria.lopez@example.com", delivery_date: "2024-01-18", total_order: 200.0 },
-    { id: 3, full_name: "Carlos Gómez", address: "789 Boulevard Norte", phone_number: "555-9876", email: "carlos.gomez@example.com", delivery_date: "2024-01-20", total_order: 320.5 },
-    { id: 4, full_name: "Ana Ramírez", address: "1010 Calle Sur", phone_number: "555-2222", email: "ana.ramirez@example.com", delivery_date: "2024-01-22", total_order: 180.25 },
-    { id: 5, full_name: "Luis Torres", address: "1212 Avenida Norte", phone_number: "555-3333", email: "luis.torres@example.com", delivery_date: "2024-01-25", total_order: 90.0 },
-  ];
+export default function OrderHistory() {
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dropdownOrderId, setDropdownOrderId] = useState(null);
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [rowsPerPage, setRowsPerPage] = useState(3);
+
+  const handleView = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  const toggleDropdown = (orderId) => {
+    setDropdownOrderId((prev) => (prev === orderId ? null : orderId));
+  };
+
+  const handleStatusChange = (orderId, newStatus) => {
+    console.log(`Order ID: ${orderId}, New Status: ${newStatus}`);
+    setDropdownOrderId(null); // Cerrar el dropdown
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(parseInt(event.target.value, 3));
     setPage(0);
   };
 
-  const handleView = (rowData) => {
-    console.log("View:", rowData);
-  };
-
-  const handleEdit = (rowData) => {
-    console.log("Edit:", rowData);
-  };
+  // Filtrar datos según la página actual
+  const paginatedOrders = orders.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
-    <div className="bg-[#fffffc] p-6">
-      <h1 className="text-[#19535f] text-2xl font-bold mb-6">Historial de Pedidos</h1>
-      <TableContainer component={Paper} className="shadow-lg rounded-lg">
-        <Table>
-          <TableHead className="bg-[#9381ff]">
-            <TableRow>
-              <TableCell className="text-[#19535f] font-bold ">ID</TableCell>
-              <TableCell className="text-[#19535f] font-bold ">Nombre Completo</TableCell>
-              <TableCell className="text-[#19535f] font-bold ">Dirección</TableCell>
-              <TableCell className="text-[#19535f] font-bold ">Teléfono</TableCell>
-              <TableCell className="text-[#19535f] font-bold ">Correo</TableCell>
-              <TableCell className="text-[#19535f] font-bold ">Fecha de Entrega</TableCell>
-              <TableCell className="text-[#19535f] font-bold ">Total del Pedido</TableCell>
-              <TableCell className="text-[#19535f] font-bold ">Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {orders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-              <TableRow key={order.id} className="hover:bg-[#f5f5f5]">
-                <TableCell>{order.id}</TableCell>
-                <TableCell>{order.full_name}</TableCell>
-                <TableCell>{order.address}</TableCell>
-                <TableCell>{order.phone_number}</TableCell>
-                <TableCell>{order.email}</TableCell>
-                <TableCell>{order.delivery_date}</TableCell>
-                <TableCell>Q{order.total_order.toFixed(2)}</TableCell>
-                <TableCell>
-                  <ActionButtons
-                    rowData={order}
-                    actions={[
-                      {
-                        icon: <FaEye />, className: "p-button-info text-green-700", tooltip: "Ver", action: handleView,
-                      },
-                      {
-                        icon: <FaEdit />, className: "p-button-warning text-blue-500", tooltip: "Editar", action: handleEdit,
-                      },
-                    ]}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[3, 5, 10]}
-          component="div"
-          count={orders.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          ActionsComponent={CustomTablePaginationActions}
+    <div className="p-6 bg-[#fffffc]">
+      <h1 className="text-2xl font-bold text-[#19535f] mb-4">Historial de Órdenes</h1>
+      <table className="w-full border border-[#beb7a4]">
+        <thead>
+          <tr className="bg-[#9381ff]">
+            <th className="p-2">ID</th>
+            <th className="p-2">Estado</th>
+            <th className="p-2">Nombre</th>
+            <th className="p-2">Teléfono</th>
+            <th className="p-2">Email</th>
+            <th className="p-2">Total Orden</th>
+            <th className="p-2">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedOrders.map((order) => (
+            <tr key={order.id}>
+              <td className="p-2 text-center">{order.id}</td>
+              <td className="p-2 text-center">{{1: "Pendiente", 2: "En Proceso", 3: "Entregado", }[order.status] || "Desconocido"} </td>
+              <td className="p-2 text-center">{order.full_name}</td>
+              <td className="p-2 text-center">{order.phone_number}</td>
+              <td className="p-2 text-center">{order.email}</td>
+              <td className="p-2 text-center">Q{order.total_order.toFixed(2)}</td>
+              <td className="p-2 flex flex-col items-center relative">
+                <ActionButtons
+                  rowData={order}
+                  actions={[
+                    {
+                      icon: <FaEye className="text-green-700" />,
+                      className: "hover:bg-green-100",
+                      tooltip: "Ver",
+                      action: handleView,
+                    },
+                    {
+                      icon: <FaEdit className="text-blue-500" />,
+                      className: "hover:bg-blue-100",
+                      tooltip: "Estado",
+                      action: () => toggleDropdown(order.id),
+                    },
+                  ]}
+                />
+                {dropdownOrderId === order.id && (
+                  <div className="absolute top-10 left-0 bg-white border border-gray-300 shadow-lg z-10 w-40 rounded-md">
+                    <ul className="divide-y divide-gray-200">
+                      <li
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleStatusChange(order.id, 1)}
+                      >
+                        Pendiente
+                      </li>
+                      <li
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleStatusChange(order.id, 2)}
+                      >
+                        En proceso
+                      </li>
+                      <li
+                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleStatusChange(order.id, 3)}
+                      >
+                        Entregado
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <TablePagination
+        component="div"
+        count={orders.length}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        labelRowsPerPage="Filas por página"
+        rowsPerPageOptions={[3, 5, 10]}
+      />
+
+      {selectedOrder && (
+        <OrderDetails
+          open={isModalOpen}
+          onClose={handleCloseModal}
+          order={selectedOrder}
         />
-      </TableContainer>
+      )}
     </div>
   );
-};
-
-export default OrderHistory;
+}
