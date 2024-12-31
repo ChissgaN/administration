@@ -2,10 +2,11 @@ import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import ProductsShop from "../Pages/ProductsShop";
+import OrderHistory from "../Pages/OrderHistory";
 
 const AuthLayout = ({ children }) => {
   const navigate = useNavigate();
-  const rol_id = 2; // Suponiendo que obtienes el rol del usuario de alguna fuente (ajusta esto según tu lógica).
+  const rol_id = 1; 
 
   /* const token = localStorage.getItem("token");
 
@@ -24,6 +25,7 @@ const AuthLayout = ({ children }) => {
       <div className="container mx-auto p-4">
         {/* Renderizar contenido basado en el rol */}
         {rol_id === 2 ? <ProductsShop /> : children}
+        {rol_id === 1 ? <OrderHistory /> : children}
       </div>
     </div>
   );
