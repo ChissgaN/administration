@@ -38,7 +38,7 @@ const Navbar = ({ rol_id }) => {
                 </Link>
               </li>
               <li>
-                <Link to="/productos" className="hover:text-[#ff7f11] transition">
+                <Link to="/products" className="hover:text-[#ff7f11] transition">
                   Productos
                 </Link>
               </li>

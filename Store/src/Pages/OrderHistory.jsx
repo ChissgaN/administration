@@ -54,7 +54,7 @@ export default function OrderHistory() {
 
   const handleStatusChange = (orderId, newStatus) => {
     console.log(`Order ID: ${orderId}, New Status: ${newStatus}`);
-    setDropdownOrderId(null); // Cerrar el dropdown
+    setDropdownOrderId(null);
   };
 
   const handleCloseModal = () => {
