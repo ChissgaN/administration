@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TablePagination } from "@mui/material";
-import OrderDetails from "../Components/OrdenDetails";
+import OrderDetails from "../Components/OrderDetails";
 import ActionButtons from "../Components/ActionButtons";
 import { FaEye, FaEdit } from "react-icons/fa";
 
