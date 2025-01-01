@@ -43,7 +43,7 @@ const Navbar = ({ rol_id }) => {
                 </Link>
               </li>
               <li>
-                <Link to="/categorias" className="hover:text-[#ff7f11] transition">
+                <Link to="/categories" className="hover:text-[#ff7f11] transition">
                   Categorías
                 </Link>
               </li>

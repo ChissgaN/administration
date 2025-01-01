@@ -7,6 +7,7 @@ import AuthLayout from './Layouts/AuthLayout';
 import Products from './Pages/Products';
 import OrderHistory from './Pages/OrderHistory';
 import ProductsShop from './Pages/ProductsShop';
+import Categories from './Pages/Categories';
 
 function App() {
   const rol_id = "";
@@ -19,6 +20,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/inicio" element={<AuthLayout>{rol_id === 1 ? <OrderHistory /> : <ProductsShop />}</AuthLayout>} />
           <Route path="/products" element={<AuthLayout><Products /></AuthLayout>} />
+          <Route path="/categories" element={<AuthLayout><Categories /></AuthLayout>} />
         </Routes>
       </Router>
     </div>

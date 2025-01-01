@@ -45,7 +45,6 @@ export default function Products() {
         name: "Activo",
       },
     },
-    // ... otros productos
   ];
 
   const handleEditClick = (producto) => {
