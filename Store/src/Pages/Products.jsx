@@ -12,70 +12,60 @@ import {
 } from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import ActionButtons from "../Components/ActionButtons";
-
-const productos = [
-  {
-    id: 8,
-    products_categories_id: 1,
-    name: "non",
-    brand: "non",
-    code: "LSZ",
-    stock: 86,
-    status_id: 1,
-    price: 621.13,
-    photo: "venenatis",
-    category: {
-      id: 1,
-      name: "Electrodomesticos",
-    },
-    status: {
-      id: 1,
-      name: "Activo",
-    },
-  },
-  {
-    id: 9,
-    products_categories_id: 2,
-    name: "justo",
-    brand: "ac",
-    code: "TPX",
-    stock: 21,
-    status_id: 1,
-    price: 7.72,
-    photo: "sed accumsan felis",
-    category: {
-      id: 2,
-      name: "Ropa",
-    },
-    status: {
-      id: 1,
-      name: "Activo",
-    },
-  },
-  {
-    id: 10,
-    products_categories_id: 3,
-    name: "sagittis",
-    brand: "eget",
-    code: "CFD",
-    stock: 47,
-    status_id: 1,
-    price: 721.53,
-    photo: "auctor gravida",
-    category: {
-      id: 3,
-      name: "Zapatos",
-    },
-    status: {
-      id: 1,
-      name: "Activo",
-    },
-  },
-];
+import Confirm from "../Components/Confirm";
+import CreateProduct from "../Components/ProductsComponents.jsx/CreateProduct";
+import EditProduct from "../Components/ProductsComponents.jsx/EditProduct";
 
 export default function Products() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(3);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState(null);
+
+  const productos = [
+    {
+      id: 8,
+      products_categories_id: 1,
+      name: "non",
+      brand: "non",
+      code: "LSZ",
+      stock: 86,
+      status_id: 1,
+      price: 621.13,
+      photo: "venenatis",
+      category: {
+        id: 1,
+        name: "Electrodomesticos",
+      },
+      status: {
+        id: 1,
+        name: "Activo",
+      },
+    },
+    // ... otros productos
+  ];
+
+  const handleEditClick = (producto) => {
+    setProductToEdit(producto);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveProduct = (updatedProduct) => {
+    console.log("Producto actualizado:", updatedProduct);
+    setIsEditDialogOpen(false);
+  };
+
+  const handleCreateClick = () => {
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleCreateProduct = (newProduct) => {
+    console.log("Producto creado:", newProduct);
+    setIsCreateDialogOpen(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -86,16 +76,14 @@ export default function Products() {
     setPage(0);
   };
 
-  const handleCreate = () => {
-    console.log("Crear nuevo producto");
+  const handleDeleteClick = (producto) => {
+    setSelectedProduct(producto);
+    setIsConfirmOpen(true);
   };
 
-  const handleEdit = (producto) => {
-    console.log("Editar producto:", producto);
-  };
-
-  const handleDelete = (producto) => {
-    console.log("Borrar producto:", producto);
+  const handleConfirmDelete = () => {
+    console.log("Producto eliminado:", selectedProduct);
+    setIsConfirmOpen(false);
   };
 
   const paginatedProducts = productos.slice(
@@ -111,7 +99,7 @@ export default function Products() {
           variant="contained"
           className="bg-[#9381ff] text-white hover:bg-[#7c6bd0] px-4 py-2 rounded-md flex items-center"
           startIcon={<FaPlus />}
-          onClick={handleCreate}
+          onClick={handleCreateClick}
         >
           Crear Producto
         </Button>
@@ -154,13 +142,13 @@ export default function Products() {
                         icon: <FaEdit className="text-blue-500" />,
                         className: "hover:bg-blue-100",
                         tooltip: "Editar",
-                        action: handleEdit,
+                        action: () => handleEditClick(producto),
                       },
                       {
                         icon: <FaTrash className="text-red-500" />,
                         className: "hover:bg-red-100",
                         tooltip: "Borrar",
-                        action: handleDelete,
+                        action: () => handleDeleteClick(producto),
                       },
                     ]}
                   />
@@ -180,6 +168,24 @@ export default function Products() {
         labelRowsPerPage="Filas por página"
         rowsPerPageOptions={[3, 5, 10]}
         className="mt-4"
+      />
+      <Confirm
+        open={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        itemName={selectedProduct?.name}
+        itemType="product"
+      />
+      <CreateProduct
+        open={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        onCreate={handleCreateProduct}
+      />
+      <EditProduct
+        open={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSave={handleSaveProduct}
+        productData={productToEdit}
       />
     </div>
   );
