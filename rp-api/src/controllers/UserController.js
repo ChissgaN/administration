@@ -4,11 +4,14 @@ import { hash } from "bcrypt";
 
 export async function index(req, res, next) {
   try {
-    const user = await User.findAll({
-      where: { status_id: 1 },
+    const mods = {
       attributes: { exclude: ["password"] },
       include: ["role", "status"],
-    });
+      where: { status_id: 1 },
+    };
+    const { query } = req;
+    query.role_id && (mods.where = { ...mods.where, role_id: query.role_id });
+    const user = await User.findAll(mods);
     res.json(user);
   } catch (error) {
     next(error);
@@ -17,6 +20,7 @@ export async function index(req, res, next) {
 
 export async function show(req, res, next) {
   try {
+    const {auth} = req;
     const user = await User.findByPk(req.params.id, {
       attributes: { exclude: ["password"] },
       include: ["role", "status"],
@@ -24,6 +28,11 @@ export async function show(req, res, next) {
     if (!user || user.status_id === 2) {
       throw { message: "User not found", status: 404 };
     }
+
+    if (auth.role_id !== 1 && auth.user_id !== user.user_id) {
+      throw { message: "Unauthorized", status: 403 };
+    }
+
     res.json(user);
   } catch (error) {
     next(error);
@@ -44,6 +53,10 @@ export async function store(req, res, next) {
 
 export async function update(req, res, next) {
   try {
+    const {auth} = req;
+    if(auth.user_id !== req.params.id) {
+      throw { message: "Unauthorized", status: 403 };
+    }
     await updateSchema.validateAsync(req.body);
     const hashedPassword = await hash(req.body.password, 10);
     req.body.password = hashedPassword;
