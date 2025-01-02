@@ -47,7 +47,7 @@ const Navbar = ({ rol_id }) => {
                 </Link>
               </li>
               <li>
-                <Link to="/categories" className="hover:text-[#ff7f11] transition">
+                <Link to="/users" className="hover:text-[#ff7f11] transition">
                   Usuarios
                 </Link>
               </li>
@@ -133,6 +133,15 @@ const Navbar = ({ rol_id }) => {
                     onClick={toggleMobileMenu}
                   >
                     Categorías
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/users"
+                    className="hover:text-[#ff7f11] transition"
+                    onClick={toggleMobileMenu}
+                  >
+                    Usuarios
                   </Link>
                 </li>
               </>

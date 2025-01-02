@@ -8,6 +8,7 @@ import Products from './Pages/Products';
 import OrderHistory from './Pages/OrderHistory';
 import ProductsShop from './Pages/ProductsShop';
 import Categories from './Pages/Categories';
+import Users from './Pages/Users';
 import PurchaseHistory from './Pages/PurchaseHistory';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Route path="/inicio" element={<AuthLayout>{rol_id === 1 ? <OrderHistory /> : <ProductsShop />}</AuthLayout>} />
           <Route path="/products" element={<AuthLayout><Products /></AuthLayout>} />
           <Route path="/categories" element={<AuthLayout><Categories /></AuthLayout>} />
+          <Route path="/users" element={<AuthLayout><Users /></AuthLayout>} />
           <Route path="/purchase-history" element={<AuthLayout><PurchaseHistory /></AuthLayout>} />
         </Routes>
       </Router>

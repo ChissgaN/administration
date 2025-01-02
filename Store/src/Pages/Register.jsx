@@ -205,12 +205,6 @@ const Register = () => {
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          ¿Ya tienes una cuenta?{" "}
-          <Link to="/" className="text-[#ff1b1c] hover:underline">
-            Inicia sesión acá
-          </Link>
-        </p>
       </div>
     </div>
     </GuestLayout>

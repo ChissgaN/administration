@@ -103,7 +103,6 @@ const Login = () => {
             )}
           </div>
 
-          {/* Mostrar mensaje de error de la API */}
           {errorMessage && (
             <p className="mb-4 text-sm text-red-500">{errorMessage}</p>
           )}
@@ -115,13 +114,6 @@ const Login = () => {
             Iniciar Sesión
           </button>
         </form>
-
-        <p className="mt-4 text-center text-sm text-gray-600">
-          ¿No tienes una cuenta?{" "}
-          <Link to="/register" className="text-[#ff1b1c] hover:underline">
-            Haz click acá para registrarte
-          </Link>
-        </p>
       </div>
     </div>
     </GuestLayout>
