@@ -32,9 +32,7 @@ export async function login(req, res, next) {
     res.cookie("token", token, {
       httpOnly: true,
       sameSite: "strict",
-      // max age 5 min
-      // maxAge: 24 * 60 * 60 * 1000,
-      maxAge: 5 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000,
     });
     res.status(200).json({ message: "Login successful" });
   } catch (error) {
@@ -65,6 +63,11 @@ export async function profile(req, res, next) {
   } catch (error) {
     next(error);
   }
+}
+
+export async function logout(req, res) {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logout successful" });
 }
 
 export default login;

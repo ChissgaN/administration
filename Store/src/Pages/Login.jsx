@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { AiOutlineShop } from "react-icons/ai";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router-dom";
 import GuestLayout from "../Layouts/GuestLayout";
+import { login } from "../libs/axios/auth/login";
+import { useNavigate } from "react-router";
 
 // Esquema de validación con YUP 
 const schema = yup.object().shape({
@@ -21,8 +22,8 @@ const schema = yup.object().shape({
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); 
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -35,87 +36,79 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:5173/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-      console.log(result);
+      const response = await login(data);
+      if (response.status === 200) {
+        navigate("/");
+      }
     } catch (error) {
-      console.log(error);
-    }
-  };
+      setErrorMessage(error.response.data.message);
+    }
+  };
 
   return (
     <GuestLayout>
-    <div className="flex min-h-screen items-center justify-center bg-[#CBE896]">
-      <div className="w-full max-w-md rounded-lg bg-[#FFFFFC] p-6 shadow-md">
-        {/* Ícono de tienda centrado */}
-        <div className="flex justify-center mb-4">
-          <AiOutlineShop size={50} className="text-blue-600" />
-        </div>
-        <h1 className="mb-6 text-center text-2xl font-semibold text-gray-700">
-          Inicio de Sesión
-        </h1>
-
-        {/* Formulario */}
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-600 mb-2">Correo Electrónico</label>
-            <input
-              type="email"
-              className={`w-full rounded-lg border px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 ${
-                errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-600"
-              }`}
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
-            )}
+      <div className="flex min-h-screen items-center justify-center bg-[#CBE896]">
+        <div className="w-full max-w-md rounded-lg bg-[#FFFFFC] p-6 shadow-md">
+          {/* Ícono de tienda centrado */}
+          <div className="flex justify-center mb-4">
+            <AiOutlineShop size={50} className="text-blue-600" />
           </div>
+          <h1 className="mb-6 text-center text-2xl font-semibold text-gray-700">
+            Inicio de Sesión
+          </h1>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-600 mb-2">Contraseña</label>
-            <div className="relative">
+          {/* Formulario */}
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-600 mb-2">Correo Electrónico</label>
               <input
-                type={showPassword ? "text" : "password"}
-                className={`w-full rounded-lg border px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 ${
-                  errors.password
+                type="email"
+                className={`w-full rounded-lg border px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 ${errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-600"
+                  }`}
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-600 mb-2">Contraseña</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`w-full rounded-lg border px-4 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 ${errors.password
                     ? "border-red-500 focus:ring-red-500"
                     : "border-gray-300 focus:ring-blue-600"
-                }`}
-                {...register("password")}
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
+                    }`}
+                  {...register("password")}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+              )}
             </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+
+            {errorMessage && (
+              <p className="mb-4 text-sm text-red-500">{errorMessage}</p>
             )}
-          </div>
 
-          {errorMessage && (
-            <p className="mb-4 text-sm text-red-500">{errorMessage}</p>
-          )}
-
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            Iniciar Sesión
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            >
+              Iniciar Sesión
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
     </GuestLayout>
   );
 };

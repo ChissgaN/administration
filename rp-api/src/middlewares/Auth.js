@@ -9,7 +9,6 @@ import { appConfig } from "../config/app_config.js";
  */
 
 export function authenticateToken(req, res, next) {
-  console.log(req.cookies);
   const token = req.cookies?.token;
 
   if (!token) {

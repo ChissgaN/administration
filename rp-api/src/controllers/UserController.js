@@ -21,10 +21,13 @@ export async function index(req, res, next) {
 export async function show(req, res, next) {
   try {
     const {auth} = req;
-    const user = await User.findByPk(req.params.id, {
+    const mods = {
       attributes: { exclude: ["password"] },
       include: ["role", "status"],
-    });
+    };
+    auth.role.id !== 1 && (mods.include.push("client"));
+    console.log(mods);
+    const user = await User.findByPk(req.params.id, mods);
     if (!user || user.status_id === 2) {
       throw { message: "User not found", status: 404 };
     }

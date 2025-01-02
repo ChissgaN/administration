@@ -1,13 +1,14 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { AiOutlineShop, AiOutlineShoppingCart, AiOutlineMenu } from "react-icons/ai";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AiOutlineShop, AiOutlineMenu } from "react-icons/ai";
 import { Menu, MenuItem } from "@mui/material";
+import { logout } from "../libs/axios/auth/logout";
 import ShopCar from "./Shopcar";
 
 const Navbar = ({ rol_id }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-
+  const navigate = useNavigate();
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -19,6 +20,13 @@ const Navbar = ({ rol_id }) => {
   const toggleMobileMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  const handleLogout = async () => {
+    const rs = await logout();
+    if (rs.status === 200) {
+      navigate("/login");
+    }
+  }
 
   return (
     <nav className="bg-[#cbe896] shadow-md">
@@ -88,7 +96,9 @@ const Navbar = ({ rol_id }) => {
               <Link to="/perfil">Perfil</Link>
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
-              <Link to="/logout">Cerrar Sesión</Link>
+              <button onClick={handleLogout}>
+                Cerrar Sesión
+              </button>
             </MenuItem>
           </Menu>
         </div>
@@ -166,7 +176,7 @@ const Navbar = ({ rol_id }) => {
                   </Link>
                 </li>
                 <li>
-                    <ShopCar />
+                  <ShopCar />
                 </li>
               </>
             )}

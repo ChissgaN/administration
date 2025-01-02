@@ -1,6 +1,7 @@
 import { sequelize } from "../libs/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import { User } from "./UserModel.js";
+
 export class Client extends Model {}
 
 Client.init(
@@ -41,13 +42,3 @@ Client.init(
     timestamps: false,
   }
 );
-
-Client.belongsTo(User, {
-  foreignKey: "user_id",
-  as: "user",
-});
-
-User.hasOne(Client, {
-  foreignKey: "user_id",
-  as: "client",
-});

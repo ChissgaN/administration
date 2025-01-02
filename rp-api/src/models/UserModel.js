@@ -2,6 +2,8 @@ import { sequelize } from "../libs/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import { Status } from "./StatusModel.js";
 import { Role } from "./RoleModel.js";
+import { Client } from "./ClientModel.js";
+
 export class User extends Model {
   static async create(user) {
     try {
@@ -95,3 +97,12 @@ User.belongsTo(Role, {
   as: "role",
 });
 
+User.hasOne(Client, {
+  foreignKey: "user_id",
+  as: "client",
+});
+
+Client.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
