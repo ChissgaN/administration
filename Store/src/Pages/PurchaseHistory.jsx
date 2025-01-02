@@ -7,13 +7,13 @@ import { FaEye, FaEdit } from "react-icons/fa";
 const orders = [
   {
     id: 1,
-    full_name: "Clovis Gallo",
+    full_name: "Gallo Clovis",
     address: "PO Box 13454",
     phone_number: "215-634-1334",
     email: "cgallo@time.com",
     delivery_date: "2024-09-21",
     total_order: 6505.92,
-    status: 1, // Estado inicial: 1 = Pendiente
+    status: 2, 
     order_details: [
       {
         id: 33,
@@ -35,7 +35,7 @@ const orders = [
   },
 ];
 
-export default function OrderHistory() {
+export default function PurchaseHistory() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dropdownOrderId, setDropdownOrderId] = useState(null);
@@ -71,7 +71,6 @@ export default function OrderHistory() {
     setPage(0);
   };
 
-  // Filtrar datos según la página actual
   const paginatedOrders = orders.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
@@ -80,7 +79,7 @@ export default function OrderHistory() {
   return (
     <div className="p-6 bg-[#fffffc]">
       <h1 className="text-2xl font-bold text-[#19535f] mb-4">
-        Historial de Órdenes
+        Historial de tus Compras
       </h1>
       <table className="w-full border border-[#beb7a4]">
         <thead>
@@ -101,8 +100,8 @@ export default function OrderHistory() {
               <td
                 className={`p-2 text-center
     ${order.status === 1 ? "text-[#ed217c]" : ""}
-    ${order.status === 2 ? "bg-blue-100 text-blue-600" : ""}
-    ${order.status === 3 ? "bg-green-100 text-green-600" : ""}
+    ${order.status === 2 ? "text-blue-600" : ""}
+    ${order.status === 3 ? "text-green-600" : ""}
     ${![1, 2, 3].includes(order.status) ? "text-gray-600" : ""}
     rounded-full px-4 py-2 font-medium`}
               >

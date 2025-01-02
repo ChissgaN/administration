@@ -23,7 +23,6 @@ const Navbar = ({ rol_id }) => {
   return (
     <nav className="bg-[#cbe896] shadow-md">
       <div className="container mx-auto flex items-center justify-between p-4">
-        {/* Icono de tienda */}
         <Link to="/" className="text-[#19535f] flex items-center text-3xl">
           <AiOutlineShop />
         </Link>
@@ -47,6 +46,11 @@ const Navbar = ({ rol_id }) => {
                   Categorías
                 </Link>
               </li>
+              <li>
+                <Link to="/categories" className="hover:text-[#ff7f11] transition">
+                  Usuarios
+                </Link>
+              </li>
             </>
           ) : (
             <>
@@ -56,7 +60,7 @@ const Navbar = ({ rol_id }) => {
                 </Link>
               </li>
               <li>
-                <Link to="/historial-compras" className="hover:text-[#ff7f11] transition">
+                <Link to="/purchase-history" className="hover:text-[#ff7f11] transition">
                   Historial de Compras
                 </Link>
               </li>
@@ -115,7 +119,7 @@ const Navbar = ({ rol_id }) => {
                 </li>
                 <li>
                   <Link
-                    to="/productos"
+                    to="/products"
                     className="hover:text-[#ff7f11] transition"
                     onClick={toggleMobileMenu}
                   >
@@ -124,7 +128,7 @@ const Navbar = ({ rol_id }) => {
                 </li>
                 <li>
                   <Link
-                    to="/categorias"
+                    to="/categories"
                     className="hover:text-[#ff7f11] transition"
                     onClick={toggleMobileMenu}
                   >
@@ -145,7 +149,7 @@ const Navbar = ({ rol_id }) => {
                 </li>
                 <li>
                   <Link
-                    to="/historial-compras"
+                    to="/purchase-history"
                     className="hover:text-[#ff7f11] transition"
                     onClick={toggleMobileMenu}
                   >
