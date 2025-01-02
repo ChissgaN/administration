@@ -7,19 +7,24 @@ import { appConfig } from "../config/app_config.js";
  * @param {function} next - Next function
  * @returns {object} - Status code and message
  */
-export default (req, res, next) => {
- 
-  const token = req.headers.authorization;
+
+export function authenticateToken(req, res, next) {
+  console.log(req.cookies);
+  const token = req.cookies?.token;
+
   if (!token) {
-    return res.status(401).json({ message: "Token not provided" });
+    return res
+      .status(401)
+      .json({ message: "Access denied. No token provided." });
   }
 
-  jwt.verify(token, appConfig.secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: "Token invalid" });
-    }
-
+  try {
+    const decoded = jwt.verify(token, appConfig.secret);
     req.auth = decoded;
-    return next();
-  });
-};
+    next();
+  } catch (error) {
+    res.status(400).json({ message: "Invalid token." });
+  }
+}
+
+export default authenticateToken;
