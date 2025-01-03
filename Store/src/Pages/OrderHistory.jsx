@@ -1,50 +1,24 @@
-import React, { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TablePagination } from "@mui/material";
 import OrderDetails from "../Components/OrderDetails";
 import ActionButtons from "../Components/ActionButtons";
 import { FaEye, FaEdit } from "react-icons/fa";
+import { allOrders } from "../libs/axios/orders/allOrders";
 
-const orders = [
-  {
-    id: 1,
-    full_name: "Clovis Gallo",
-    address: "PO Box 13454",
-    phone_number: "215-634-1334",
-    email: "cgallo@time.com",
-    delivery_date: "2024-09-21",
-    total_order: 6505.92,
-    status: 1, // Estado inicial: 1 = Pendiente
-    order_details: [
-      {
-        id: 33,
-        product_id: 8,
-        quantity: 9,
-        price: 491.65,
-        subtotal: 4729.21,
-        product: { name: "emin" },
-      },
-      {
-        id: 34,
-        product_id: 9,
-        quantity: 5,
-        price: 355.34,
-        subtotal: 1776.71,
-        product: { name: "nisi" },
-      },
-    ],
-  },
-];
+import { updateOrderStatus } from "../libs/axios/orders/updateOrderStatus";
+import { AuthContext } from "../context/AuthContext";
 
 export default function OrderHistory() {
+  const { status } = useContext(AuthContext);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dropdownOrderId, setDropdownOrderId] = useState(null);
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(3);
+  const [orders, setOrders] = useState([]);
 
   const handleView = (order) => {
-    setSelectedOrder(order);
+    setSelectedOrder(order.id);
     setIsModalOpen(true);
   };
 
@@ -53,8 +27,15 @@ export default function OrderHistory() {
   };
 
   const handleStatusChange = (orderId, newStatus) => {
-    console.log(`Order ID: ${orderId}, New Status: ${newStatus}`);
-    setDropdownOrderId(null);
+    updateOrderStatus(orderId, newStatus)
+      .then(() => {
+        getOrders()
+        setDropdownOrderId(null);
+      })
+      .catch((error) => {
+        console.error(error);
+      });;
+
   };
 
   const handleCloseModal = () => {
@@ -77,6 +58,18 @@ export default function OrderHistory() {
     page * rowsPerPage + rowsPerPage
   );
 
+
+
+  function getOrders() {
+    allOrders()
+      .then((response) => {
+        setOrders(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+  useEffect(getOrders, []);
   return (
     <div className="p-6 bg-[#fffffc]">
       <h1 className="text-2xl font-bold text-[#19535f] mb-4">
@@ -99,20 +92,10 @@ export default function OrderHistory() {
             <tr key={order.id}>
               <td className="p-2 text-center">{order.id}</td>
               <td
-                className={`p-2 text-center
-    ${order.status === 1 ? "text-[#ed217c]" : ""}
-    ${order.status === 2 ? "bg-blue-100 text-blue-600" : ""}
-    ${order.status === 3 ? "bg-green-100 text-green-600" : ""}
-    ${![1, 2, 3].includes(order.status) ? "text-gray-600" : ""}
-    rounded-full px-4 py-2 font-medium`}
+                className={`text-center p-2 ${statusColor[order.status.id] || statusColor.default} rounded-full font-medium`}
               >
-                {{
-                  1: "Pendiente",
-                  2: "En Proceso",
-                  3: "Entregado",
-                }[order.status] || "Desconocido"}
+                {order.status.name}
               </td>
-
               <td className="p-2 text-center">{order.full_name}</td>
               <td className="p-2 text-center">{order.phone_number}</td>
               <td className="p-2 text-center">{order.email}</td>
@@ -130,34 +113,36 @@ export default function OrderHistory() {
                       action: handleView,
                     },
                     {
-                      icon: <FaEdit className="text-blue-500" />,
+                      icon: (
+                        <FaEdit
+                          className={
+                            order.status_id === 5
+                              ? "text-gray-500"
+                              : "text-blue-500"
+                          }
+                        />
+                      ),
                       className: "hover:bg-blue-100",
                       tooltip: "Estado",
-                      action: () => toggleDropdown(order.id),
+                      action: () =>
+                        order.status_id === 5 ? null : toggleDropdown(order.id),
                     },
                   ]}
                 />
                 {dropdownOrderId === order.id && (
                   <div className="absolute top-10 left-0 bg-white border border-gray-300 shadow-lg z-10 w-40 rounded-md">
                     <ul className="divide-y divide-gray-200">
-                      <li
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleStatusChange(order.id, 1)}
-                      >
-                        Pendiente
-                      </li>
-                      <li
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleStatusChange(order.id, 2)}
-                      >
-                        En proceso
-                      </li>
-                      <li
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleStatusChange(order.id, 3)}
-                      >
-                        Entregado
-                      </li>
+                      {status
+                        .filter((s) => s.id !== 1 && s.id !== 2)
+                        .map((r) => (
+                          <li
+                            key={r.id}
+                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => handleStatusChange(order.id, r.id)}
+                          >
+                            {r.name}
+                          </li>
+                        ))}
                     </ul>
                   </div>
                 )}
@@ -182,9 +167,17 @@ export default function OrderHistory() {
         <OrderDetails
           open={isModalOpen}
           onClose={handleCloseModal}
-          order={selectedOrder}
+          order_id={selectedOrder}
         />
       )}
     </div>
   );
+}
+
+
+const statusColor = {
+  "5": "text-[#ed217c]",
+  "3": "text-blue-600",
+  "4": "text-green-600",
+  "default": "text-gray-600",
 }

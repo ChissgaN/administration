@@ -42,7 +42,7 @@ export async function show(req, res, next) {
         },
       ],
     });
-
+    console.log(role);
     if (!order || (role.id === 2 && order.client_id !== req.auth.id)) {
       throw { message: "Order not found", status: 404 };
     }
@@ -83,7 +83,7 @@ export async function update(req, res, next) {
 export async function updateStatus(req, res, next) {
   try {
     const { role } = req.auth;
-    const orden_detail = await Order.find(req.params.id);
+    const orden_detail = await Order.findByPk(req.params.id);
     if (
       !orden_detail ||
       (role.id === 2 && orden_detail.client_id !== req.auth.id)
@@ -92,7 +92,7 @@ export async function updateStatus(req, res, next) {
     }
     role.id === 2 && (req.body.status_id = 5);
     await Order.orderStatus(req.body.status_id, req.params.id);
-    res.json({ message: "Order removed successfully" });
+    res.status(204).json({ message: "Order status updated successfully" });
   } catch (error) {
     next(error);
   }
