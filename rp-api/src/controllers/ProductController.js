@@ -35,11 +35,12 @@ export async function store(req, res, next) {
   try {
     const user_id = req.auth.id;
     const photo = req?.file?.path;
+    console.log(req.file);
     await storeSchema.validateAsync(req.body);
-    await Product.create({ ...req.body, user_id, photo });
-    res.json({ message: "Product created successfully" });
+    await Product.create({ ...req.body, user_id, photo, status_id: 1 });
+    res.status(201).json({ message: "Product created successfully" });
   } catch (error) {
-    unlinkFile(req.file.path);
+    unlinkFile(req?.file?.path);
     next(error);
   }
 }

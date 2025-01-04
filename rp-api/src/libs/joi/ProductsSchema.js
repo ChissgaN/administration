@@ -6,7 +6,6 @@ export const storeSchema = joi.object({}).keys({
   brand: joi.string().required(),
   code: joi.string().required(),
   stock: joi.number().required(),
-  status_id: joi.number().required(),
   price: joi.number().required()
 });
 

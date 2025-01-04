@@ -2,16 +2,18 @@ import { sequelize } from "../libs/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import { Status } from "./StatusModel.js";
 import { Category } from "./CategoryModel.js";
-
+import GetQuery from "../helpers/GetQuery.js";
 export class Product extends Model {
   static async create(product) {
     try {
-      const request = await pool.request();
-      Object.entries(product).forEach(([key, value]) => {
-        request.input(key, value);
-      });
+      let query = "EXEC sp_register_products";
 
-      await request.execute("sp_register_products");
+      query += GetQuery(product);
+
+      const request = await sequelize.query(query, {
+        replacements: product,
+        type: sequelize.QueryTypes.RAW,
+      });
     } catch (error) {
       throw error;
     }
@@ -19,12 +21,13 @@ export class Product extends Model {
 
   static async update(product) {
     try {
-      const request = await pool.request();
-      Object.entries(product).forEach(([key, value]) => {
-        request.input(key, value);
-      });
+      let query = "EXEC sp_update_products";
 
-      await request.execute("sp_update_products");
+      query += GetQuery(product);
+      sequelize.query(query, {
+        replacements: product,
+        type: sequelize.QueryTypes.RAW,
+      });
     } catch (error) {
       console.log(error);
       throw error;
@@ -33,11 +36,12 @@ export class Product extends Model {
 
   static async remove(status_id, product_id) {
     try {
-      const request = await pool.request();
-      request.input("status_id", status_id);
-      request.input("product_id", product_id);
+      let query = "EXEC sp_delete_products @status_id=:status_id, @product_id=:product_id";
+      sequelize.query(query, {
+        replacements: { status_id, product_id },  
+        type: sequelize.QueryTypes.RAW,
+      });
 
-      await request.execute("sp_update_product_status");
     } catch (error) {
       throw error;
     }
