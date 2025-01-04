@@ -20,7 +20,7 @@ const EditCategories = ({ open, onClose, category, onUpdate }) => {
   }, [category, setValue]);
 
   const onSubmit = (data) => {
-    onUpdate({ ...category, name: data.name });
+    onUpdate(category.id, data.name);
     onClose();
   };
 

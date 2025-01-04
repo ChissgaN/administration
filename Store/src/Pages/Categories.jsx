@@ -7,7 +7,7 @@ import Confirm from "../Components/Confirm";
 import ActionButtons from "../Components/ActionButtons";
 import CreateCategories from "../Components/CategoriesComponents.jsx/CreateCategories";
 import EditCategories from "../Components/CategoriesComponents.jsx/EditCategories"; // Importa el componente EditCategories
-import { getAllCategories, createCategory } from "../libs/axios/categories"
+import { getAllCategories, createCategory, updateCategory } from "../libs/axios/categories"
 
 export default function Categories() {
   const [page, setPage] = useState(0);
@@ -27,6 +27,18 @@ export default function Categories() {
       })
       .catch((error) => {
         console.error("Error al crear la categoría:", error);
+      });
+  };
+
+  const handleUpdateCategory = (id, categoryName) => {
+    updateCategory(id, { name: categoryName })
+      .then((response) => {
+        if (response.status === 200) {
+          getCategories(); // Obtener las categorías actualizadas
+        }
+      })
+      .catch((error) => {
+        console.error("Error al actualizar la categoría:", error);
       });
   };
 
@@ -159,17 +171,14 @@ export default function Categories() {
         onCreate={handleCreateCategory}
       />
 
-      {selectedCategory && (
-        <EditCategories
-          open={isEditDialogOpen}
-          onClose={() => setIsEditDialogOpen(false)}
-          category={selectedCategory}
-          onUpdate={(updatedCategory) => {
-            console.log("Categoría actualizada:", updatedCategory);
-            setIsEditDialogOpen(false);
-          }}
-        />
-      )}
+
+      <EditCategories
+        open={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        category={selectedCategory}
+        onUpdate={handleUpdateCategory}
+      />
+
     </div>
   );
 }
