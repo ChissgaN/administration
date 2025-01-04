@@ -44,8 +44,8 @@ export async function store(req, res, next) {
   try {
     const user_id = req.auth.id;
     await storeSchema.validateAsync(req.body);
-    await Category.create({ ...req.body, user_id });
-    res.json({ message: "Category created successfully" });
+    await Category.create({ ...req.body, user_id, status_id: 1 });
+    res.status(201).json({ message: "Category created successfully" });
   } catch (error) {
     next(error);
   }

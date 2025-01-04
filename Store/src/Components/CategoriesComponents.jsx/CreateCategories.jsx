@@ -19,6 +19,7 @@ const validationSchema = yup.object().shape({
 });
 
 const CreateCategories = ({ open, onClose, onCreate }) => {
+ 
   const {
     handleSubmit,
     control,
@@ -34,6 +35,7 @@ const CreateCategories = ({ open, onClose, onCreate }) => {
   const onSubmit = (data) => {
     onCreate(data); 
     reset(); 
+    onClose();
   };
 
   const handleClose = () => {

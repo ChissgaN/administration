@@ -1,59 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TablePagination,
-  Button,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button,
 } from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import Confirm from "../Components/Confirm";
 import ActionButtons from "../Components/ActionButtons";
 import CreateCategories from "../Components/CategoriesComponents.jsx/CreateCategories";
 import EditCategories from "../Components/CategoriesComponents.jsx/EditCategories"; // Importa el componente EditCategories
-
-const categories = [
-  {
-    id: 1,
-    name: "Electrodomesticos",
-    status_id: 1,
-    user_id: 1,
-    user: {
-      id: 1,
-      role_id: 1,
-      status_id: 1,
-      email: "jj@mail.com",
-      phone_number: "12345678",
-      birth_date: "1989-12-31",
-    },
-    status: {
-      id: 1,
-      name: "Activo",
-    },
-  },
-  {
-    id: 2,
-    name: "Ropa",
-    status_id: 1,
-    user_id: 2,
-    user: {
-      id: 2,
-      role_id: 2,
-      status_id: 1,
-      email: "user2@mail.com",
-      phone_number: "98765432",
-      birth_date: "1995-01-10",
-    },
-    status: {
-      id: 1,
-      name: "Activo",
-    },
-  },
-];
+import { getAllCategories, createCategory } from "../libs/axios/categories"
 
 export default function Categories() {
   const [page, setPage] = useState(0);
@@ -61,11 +15,19 @@ export default function Categories() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false); // Nuevo estado para el formulario de edición
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [categories, setCategories] = useState([]); // Estado para almacenar las categorías
 
   const handleCreateCategory = (newCategory) => {
-    console.log("Nueva Categoría Creada:", newCategory);
-    setIsCreateDialogOpen(false);
+    createCategory(newCategory)
+      .then((response) => {
+        if (response.status === 201) {
+          getCategories(); // Obtener las categorías actualizadas
+        }
+      })
+      .catch((error) => {
+        console.error("Error al crear la categoría:", error);
+      });
   };
 
   const handleChangePage = (event, newPage) => {
@@ -96,6 +58,17 @@ export default function Categories() {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+
+  const getCategories = () => {
+    getAllCategories().then((response) => {
+      setCategories(response.data); // Almacenar las categorías en el estado
+    })
+      .catch((error) => {
+        console.error("Error al obtener las categorías:", error);
+      });
+  }
+
+  useEffect(getCategories, []);
 
   return (
     <div className="p-6 bg-[#fffffc]">
@@ -129,11 +102,10 @@ export default function Categories() {
                 <TableCell>{category.user.email}</TableCell>
                 <TableCell>
                   <span
-                    className={`px-2 py-1 rounded-full text-sm ${
-                      category.status.name === "Activo"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
-                    }`}
+                    className={`px-2 py-1 rounded-full text-sm ${category.status.name === "Activo"
+                      ? "bg-green-100 text-green-600"
+                      : "bg-red-100 text-red-600"
+                      }`}
                   >
                     {category.status.name}
                   </span>
@@ -184,17 +156,14 @@ export default function Categories() {
       <CreateCategories
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
-        onCreate={(newCategory) => {
-          console.log("Nueva Categoría Creada:", newCategory);
-          setIsCreateDialogOpen(false);
-        }}
+        onCreate={handleCreateCategory}
       />
 
       {selectedCategory && (
         <EditCategories
           open={isEditDialogOpen}
           onClose={() => setIsEditDialogOpen(false)}
-          category={selectedCategory} 
+          category={selectedCategory}
           onUpdate={(updatedCategory) => {
             console.log("Categoría actualizada:", updatedCategory);
             setIsEditDialogOpen(false);

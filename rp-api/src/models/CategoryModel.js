@@ -2,42 +2,42 @@ import { sequelize } from "../libs/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import { Status } from "./StatusModel.js";
 import { User } from "./UserModel.js";
-
+import getQuery from "../helpers/GetQuery.js";
 export class Category extends Model {
-  static async create(product) {
+  static async create(category) {
     try {
-      const request = await pool.request();
-      Object.entries(product).forEach(([key, value]) => {
-        request.input(key, value);
-      });
+      let query = "EXEC sp_register_products_categories ";
+      query += getQuery(category);
 
-      await request.execute("sp_register_products_categories");
+      await sequelize.query(query, {
+        replacements: category,
+        type: sequelize.QueryTypes.RAW,
+      });
     } catch (error) {
       throw error;
     }
   }
 
-  static async update(product) {
+  static async update(category) {
     try {
-      const request = await pool.request();
-      Object.entries(product).forEach(([key, value]) => {
-        request.input(key, value);
+      let query = "EXEC sp_update_products_categories ";
+      query += getQuery(category);
+      await sequelize.query(query, {
+        replacements: category,
+        type: sequelize.QueryTypes.RAW,
       });
-
-      await request.execute("sp_update_products_categories");
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
 
   static async remove(status_id, product_id) {
     try {
-      const request = await pool.request();
-      request.input("status_id", status_id);
-      request.input("product_id", product_id);
-
-      await request.execute("sp_update_product_status");
+      let query = "EXEC sp_delete_products_categories @status_id = :status_id, @product_id = :product_id";
+      await sequelize.query(query, {
+        replacements: { status_id, product_id },
+        type: sequelize.QueryTypes.RAW,
+      });
     } catch (error) {
       throw error;
     }
