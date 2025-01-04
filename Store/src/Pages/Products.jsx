@@ -17,9 +17,11 @@ import CreateProduct from "../Components/ProductsComponents.jsx/CreateProduct";
 import EditProduct from "../Components/ProductsComponents.jsx/EditProduct";
 import { getAllProducts } from "../libs/axios/products/getAllProducts";
 import { createNewProduct } from "../libs/axios/products/createNewProduct";
+import { updateProduct } from "../libs/axios/products/updateProduct";
+import { deleteProduct } from "../libs/axios/products/deleteProduct";
 
 const base_api_url = import.meta.env.VITE_BASE_API_URL;
- 
+
 export default function Products() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(3);
@@ -36,7 +38,14 @@ export default function Products() {
   };
 
   const handleSaveProduct = (updatedProduct) => {
-    console.log("Producto actualizado:", updatedProduct);
+    updateProduct(productToEdit.id, updatedProduct)
+      .then((rs) => {
+        if (rs.status === 200) {
+          getProducts();
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
     setIsEditDialogOpen(false);
   };
 
@@ -67,7 +76,14 @@ export default function Products() {
   };
 
   const handleConfirmDelete = () => {
-    console.log("Producto eliminado:", selectedProduct);
+    deleteProduct(selectedProduct.id)
+      .then((rs) => {
+        if (rs.status === 200) {
+          getProducts();
+        }
+      }).catch((error) => {
+        console.error(error);
+      });
     setIsConfirmOpen(false);
   };
 
@@ -79,7 +95,6 @@ export default function Products() {
   function getProducts() {
     getAllProducts().then((rs) => {
       setProductos(rs);
-      console.log(rs);
     })
       .catch((error) => {
         console.error(error);
@@ -118,9 +133,9 @@ export default function Products() {
               <TableRow key={producto.id} className="hover:bg-gray-100">
                 <TableCell>{producto.id}</TableCell>
                 <TableCell>
-                  
+
                   <div className="w-12 h-12 bg-[#beb7a4] flex items-center justify-center rounded-md text-sm">
-                    {producto.photo ? <img src={base_api_url + `/${producto.photo}`} alt={producto.photo} className="w-full h-full object-cover object-top" width={40}/> : "No image"}
+                    {producto.photo ? <img src={base_api_url + `/${producto.photo}`} alt={producto.photo} className="w-full h-full object-cover object-top" width={40} /> : "No image"}
                   </div>
                 </TableCell>
                 <TableCell>{producto.name}</TableCell>

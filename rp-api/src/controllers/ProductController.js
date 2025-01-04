@@ -8,7 +8,7 @@ export async function index(req, res, next) {
   try {
     const products = await Product.findAll({
       where: { status_id: 1 },
-      include: ["category","status"],
+      include: ["category", "status"],
     });
     res.json(products);
   } catch (error) {
@@ -19,7 +19,7 @@ export async function index(req, res, next) {
 export async function show(req, res, next) {
   try {
     const product = await Product.findByPk(req.params.id, {
-      include: ["category","status"],
+      include: ["category", "status"],
     });
 
     if (!product || product.status_id === 2) {
@@ -35,7 +35,6 @@ export async function store(req, res, next) {
   try {
     const user_id = req.auth.id;
     const photo = req?.file?.path;
-    console.log(req.file);
     await storeSchema.validateAsync(req.body);
     await Product.create({ ...req.body, user_id, photo, status_id: 1 });
     res.status(201).json({ message: "Product created successfully" });
@@ -48,7 +47,7 @@ export async function store(req, res, next) {
 export async function update(req, res, next) {
   let product = null;
   try {
-    product = await ProductsModel.find(req.params.id);
+    product = await Product.findByPk(req.params.id);
     if (!product) {
       throw { message: "Product not found", status: 404 };
     }
@@ -66,15 +65,14 @@ export async function update(req, res, next) {
     };
 
     await updateSchema.validateAsync(req.body);
-    await ProductsModel.update(data);
+    await Product.update(data);
 
-    res.json({ message: "Product updated successfully" });
+    res.status(200).json({ message: "Product updated successfully" });
   } catch (error) {
     unlinkFile(req?.file?.path);
     next(error);
   } finally {
     if (req?.file?.path && product?.photo) {
-      console.log(req.file.path, product.photo);
       unlinkFile(product?.photo);
     }
   }

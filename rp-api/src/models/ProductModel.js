@@ -36,12 +36,12 @@ export class Product extends Model {
 
   static async remove(status_id, product_id) {
     try {
-      let query = "EXEC sp_delete_products @status_id=:status_id, @product_id=:product_id";
+      let query =
+        "EXEC sp_update_product_status @status_id=:status_id, @product_id=:product_id";
       sequelize.query(query, {
-        replacements: { status_id, product_id },  
+        replacements: { status_id, product_id },
         type: sequelize.QueryTypes.RAW,
       });
-
     } catch (error) {
       throw error;
     }

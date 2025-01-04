@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -12,6 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Dropzone from "react-dropzone";
+import { use } from "react";
 
 const schema = yup.object().shape({
   products_categories_id: yup.string().required("La categoría es requerida."),
@@ -32,7 +33,7 @@ const schema = yup.object().shape({
 });
 
 export default function CreateProduct({ open, onClose, onCreate }) {
-  const { control, handleSubmit, setValue } = useForm({
+  const { control, handleSubmit, setValue, getValues, reset } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       products_categories_id: "",
@@ -54,7 +55,9 @@ export default function CreateProduct({ open, onClose, onCreate }) {
   const onSubmit = (data) => {
     onCreate(data);
     onClose();
+    reset();
   };
+
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -175,11 +178,11 @@ export default function CreateProduct({ open, onClose, onCreate }) {
                   {({ getRootProps, getInputProps }) => (
                     <div
                       {...getRootProps()}
-                      className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer bg-[#e3d8f1] text-[#9381ff] hover:bg-[#d8c9f0] transition duration-300"
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer bg-[#e3d8f1] text-[#9381ff] hover:bg-[#d8c9f0] transition duration-300 ${getValues("photo") && " border-green-400"}`}
                     >
                       <input {...getInputProps()} />
                       <p className="text-sm font-medium">
-                        Arrastra y suelta una imagen aquí, o haz clic para seleccionarla.
+                        {getValues("photo")?.name || "Arrastra una imagen aquí o haz click para seleccionarla"}
                       </p>
                     </div>
                   )}

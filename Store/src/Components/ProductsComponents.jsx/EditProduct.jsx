@@ -32,7 +32,7 @@ const schema = yup.object().shape({
 });
 
 export default function EditProduct({ open, onClose, onSave, productData }) {
-  const { control, handleSubmit, setValue } = useForm({
+  const { control, handleSubmit, setValue, getValues } = useForm({
     resolver: yupResolver(schema),
     defaultValues: productData || {
       products_categories_id: "",
@@ -59,8 +59,23 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
   };
 
   const onSubmit = (data) => {
-    console.log("Datos del producto editado:", data);
-    onSave(data);
+    
+    const { status, category, ...rest } = data; // delete status and category from validation 
+
+    const updatedData = Object.entries(rest).reduce((acc, [key, value]) => { // iterate over the rest of the data and check if the value is different from the original value in productData and add it to the acc object
+
+      if (key === "photo" && value instanceof File) {
+        acc[key] = value;
+      } else {
+        const oldValue = productData[key];
+        const newValue = typeof oldValue === 'number' ? parseFloat(value) : value;
+        if (newValue !== oldValue) {
+          acc[key] = newValue;
+        }
+      }
+      return acc;
+    }, {});
+    onSave(updatedData);
     onClose();
   };
 
@@ -69,41 +84,41 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
       <DialogTitle className="text-[#ed217c] font-bold">Editar Producto</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
-        <div className="flex justify-around gap-4 mt-4">
-          <Controller
-            name="products_categories_id"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                select
-                label="Categoría"
-                fullWidth
-                margin="normal"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-              >
-                <MenuItem value="1">Electrodomésticos</MenuItem>
-                <MenuItem value="2">Ropa</MenuItem>
-                <MenuItem value="3">Zapatos</MenuItem>
-              </TextField>
-            )}
-          />
+          <div className="flex justify-around gap-4 mt-4">
+            <Controller
+              name="products_categories_id"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  select
+                  label="Categoría"
+                  fullWidth
+                  margin="normal"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                >
+                  <MenuItem value="1">Electrodomésticos</MenuItem>
+                  <MenuItem value="2">Ropa</MenuItem>
+                  <MenuItem value="3">Zapatos</MenuItem>
+                </TextField>
+              )}
+            />
 
-          <Controller
-            name="name"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                label="Nombre"
-                fullWidth
-                margin="normal"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-              />
-            )}
-          />
+            <Controller
+              name="name"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Nombre"
+                  fullWidth
+                  margin="normal"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
           </div>
 
           <div className="flex justify-around gap-4 mt-4">
@@ -184,11 +199,11 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
                   {({ getRootProps, getInputProps }) => (
                     <div
                       {...getRootProps()}
-                      className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer bg-[#e3d8f1] text-[#9381ff] hover:bg-[#d8c9f0] transition duration-300"
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer bg-[#e3d8f1] text-[#9381ff] hover:bg-[#d8c9f0] transition duration-300 ${getValues("photo") && " border-green-400"}`}
                     >
                       <input {...getInputProps()} />
                       <p className="text-sm font-medium">
-                        Arrastra y suelta una imagen aquí, o haz clic para seleccionarla.
+                        {getValues("photo")?.name || getValues("photo") || "Arrastra una imagen aquí o haz clic para seleccionarla"}
                       </p>
                     </div>
                   )}
@@ -204,7 +219,7 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
         </DialogContent>
 
         <DialogActions className="my-4 ">
-        <Button onClick={onClose} color="error" variant="contained" >
+          <Button onClick={onClose} color="error" variant="contained" >
             Cancelar
           </Button>
           <Button type="submit" variant="contained" color="primary">
