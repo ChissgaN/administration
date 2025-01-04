@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, static as static_ } from "express";
 import { product_router } from "./ProductRouter.js";
 import { category_router } from "./CategoryRouter.js";
 import { status_router } from "./StatusRouter.js";
@@ -9,15 +9,18 @@ import { auth_router } from "./AuthRouter.js";
 import { role_router } from "./RoleRouter.js";
 
 import auth from "../middlewares/Auth.js";
+import path from "path";
 
 const app_router = Router();
-
+const __dirname = path.resolve();
 /**
  * @description Register all routes
  * @param {Router} app
  */
 export function routes(app) {
   app.use("/api/v1", app_router);
+  // static files route for uploads folder
+  app_router.use("/uploads", static_(path.join(__dirname, "uploads")));
 
   app_router.use("/auth", auth_router);
 
