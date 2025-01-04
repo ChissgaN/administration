@@ -41,7 +41,6 @@ export default function CreateProduct({ open, onClose, onCreate }) {
       code: "",
       stock: 1,
       price: 0,
-      status_id: 1,
       photo: null,
     },
   });
@@ -53,7 +52,6 @@ export default function CreateProduct({ open, onClose, onCreate }) {
   };
 
   const onSubmit = (data) => {
-    console.log("Datos del producto creado:", data);
     onCreate(data);
     onClose();
   };
@@ -61,44 +59,44 @@ export default function CreateProduct({ open, onClose, onCreate }) {
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle className="text-[#ed217c] font-bold">Crear Producto</DialogTitle>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
         <DialogContent>
-        <div className="flex justify-around gap-4 mt-4">
-          <Controller
-            name="products_categories_id"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                select
-                label="Categoría"
-                fullWidth
-                margin="normal"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-              >
-                <MenuItem value="1">Electrodomésticos</MenuItem>
-                <MenuItem value="2">Ropa</MenuItem>
-                <MenuItem value="3">Zapatos</MenuItem>
-              </TextField>
-            )}
-          />
+          <div className="flex justify-around gap-4 mt-4">
+            <Controller
+              name="products_categories_id"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  select
+                  label="Categoría"
+                  fullWidth
+                  margin="normal"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                >
+                  <MenuItem value="1">Electrodomésticos</MenuItem>
+                  <MenuItem value="2">Ropa</MenuItem>
+                  <MenuItem value="3">Zapatos</MenuItem>
+                </TextField>
+              )}
+            />
 
-          <Controller
-            name="name"
-            control={control}
-            render={({ field, fieldState }) => (
-              <TextField
-                {...field}
-                label="Nombre"
-                fullWidth
-                margin="normal"
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
-              />
-            )}
-          />
-        </div>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field, fieldState }) => (
+                <TextField
+                  {...field}
+                  label="Nombre"
+                  fullWidth
+                  margin="normal"
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+          </div>
           <div className="flex justify-around gap-4 mt-4">
             <Controller
               name="brand"
@@ -197,7 +195,7 @@ export default function CreateProduct({ open, onClose, onCreate }) {
         </DialogContent>
 
         <DialogActions className="my-4 ">
-        <Button onClick={onClose} color="error" variant="contained" >
+          <Button onClick={onClose} color="error" variant="contained" >
             Cancelar
           </Button>
           <Button type="submit" variant="contained" color="primary">

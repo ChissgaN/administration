@@ -19,7 +19,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<AuthLayout />} >
-            <Route path="/products" Component={<Products />} />
+            <Route path="/products" element={<Products />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/users" element={<Users />} />
             <Route path="/purchase-history" element={<PurchaseHistory />} />

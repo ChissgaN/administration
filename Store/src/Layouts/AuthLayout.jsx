@@ -1,12 +1,12 @@
 import { AuthContext } from "../context/AuthContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import ProductsShop from "../Pages/ProductsShop";
 import OrderHistory from "../Pages/OrderHistory";
 import { getProfile } from "../libs/axios/auth/getProfile";
 import { useEffect, useState } from "react";
 import { getAllStatus } from "../libs/axios/status/getAllStatus";
-const AuthLayout = ({ children }) => {
+const AuthLayout = () => {
   const [profile, setProfile] = useState({});
   const [status, setStatus] = useState([]);
   const location = useLocation();
@@ -39,7 +39,7 @@ const AuthLayout = ({ children }) => {
         {location.pathname === "/" ? (
           profile?.role_id === 1 ? <OrderHistory /> : <ProductsShop />
         ) : (
-          children
+          <Outlet />
         )}
       </div>
 

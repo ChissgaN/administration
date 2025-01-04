@@ -40,7 +40,7 @@ const Navbar = ({ rol_id }) => {
           {rol_id === 1 ? (
             <>
               <li>
-                <Link to="/inicio" className="hover:text-[#ff7f11] transition">
+                <Link to="/" className="hover:text-[#ff7f11] transition">
                   Inicio
                 </Link>
               </li>

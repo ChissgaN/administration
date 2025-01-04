@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -15,6 +15,8 @@ import ActionButtons from "../Components/ActionButtons";
 import Confirm from "../Components/Confirm";
 import CreateProduct from "../Components/ProductsComponents.jsx/CreateProduct";
 import EditProduct from "../Components/ProductsComponents.jsx/EditProduct";
+import { getAllProducts } from "../libs/axios/products/getAllProducts";
+import { createNewProduct } from "../libs/axios/products/createNewProduct";
 
 export default function Products() {
   const [page, setPage] = useState(0);
@@ -24,28 +26,7 @@ export default function Products() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
-
-  const productos = [
-    {
-      id: 8,
-      products_categories_id: 1,
-      name: "non",
-      brand: "non",
-      code: "LSZ",
-      stock: 86,
-      status_id: 1,
-      price: 621.13,
-      photo: "venenatis",
-      category: {
-        id: 1,
-        name: "Electrodomesticos",
-      },
-      status: {
-        id: 1,
-        name: "Activo",
-      },
-    },
-  ];
+  const [productos, setProductos] = useState([]);
 
   const handleEditClick = (producto) => {
     setProductToEdit(producto);
@@ -61,8 +42,11 @@ export default function Products() {
     setIsCreateDialogOpen(true);
   };
 
-  const handleCreateProduct = (newProduct) => {
-    console.log("Producto creado:", newProduct);
+  const handleCreateProduct = async (newProduct) => {
+    const response = await createNewProduct(newProduct);
+    if (response.status === 201) {
+      getProducts();
+    }
     setIsCreateDialogOpen(false);
   };
 
@@ -90,6 +74,18 @@ export default function Products() {
     page * rowsPerPage + rowsPerPage
   );
 
+  function getProducts() {
+    getAllProducts().then((rs) => {
+      setProductos(rs);
+    })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  useEffect(getProducts, []);
+
+
   return (
     <div className="p-6 bg-[#fffffc]">
       <div className="flex justify-between items-center mb-4">
@@ -107,15 +103,11 @@ export default function Products() {
         <Table>
           <TableHead className="bg-[#9381ff]">
             <TableRow>
-              <TableCell className="text-white font-bold">ID</TableCell>
-              <TableCell className="text-white font-bold">Foto</TableCell>
-              <TableCell className="text-white font-bold">Nombre</TableCell>
-              <TableCell className="text-white font-bold">Categoría</TableCell>
-              <TableCell className="text-white font-bold">Marca</TableCell>
-              <TableCell className="text-white font-bold">Código</TableCell>
-              <TableCell className="text-white font-bold">Stock</TableCell>
-              <TableCell className="text-white font-bold">Precio</TableCell>
-              <TableCell className="text-white font-bold">Acciones</TableCell>
+              {tableHeader.map((header) => (
+                <TableCell key={header} className="text-white font-bold">
+                  {header}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -189,3 +181,15 @@ export default function Products() {
     </div>
   );
 }
+
+const tableHeader = [
+  "ID",
+  "Foto",
+  "Nombre",
+  "Categoría",
+  "Marca",
+  "Código",
+  "Stock",
+  "Precio",
+  "Acciones",
+]
