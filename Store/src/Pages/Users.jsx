@@ -1,55 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TablePagination,
-  Button,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button,
 } from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import ActionButtons from "../Components/ActionButtons";
 import Confirm from "../Components/Confirm";
 import CreateUser from "../Components/UsersComponents.jsx/CreateUser";
 import EditUser from "../Components/UsersComponents.jsx/EditUser";
+import u from "../libs/axios/users";
 
-const users = [
-  {
-    id: 1,
-    role_id: 1,
-    status_id: 1,
-    email: "jj@mail.com",
-    phone_number: "12345678",
-    birth_date: "1989-12-31",
-    role: {
-      id: 1,
-      name: "Administrador",
-    },
-    status: {
-      id: 1,
-      name: "Activo",
-    },
-  },
-  {
-    id: 2,
-    role_id: 2,
-    status_id: 2,
-    email: "user2@mail.com",
-    phone_number: "98765432",
-    birth_date: "1995-01-10",
-    role: {
-      id: 2,
-      name: "Usuario",
-    },
-    status: {
-      id: 2,
-      name: "Inactivo",
-    },
-  },
-];
 
 export default function Users() {
   const [page, setPage] = useState(0);
@@ -58,7 +17,7 @@ export default function Users() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
-
+  const [users, setUsers] = useState([]);
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -87,14 +46,35 @@ export default function Users() {
   };
 
   const handleConfirmDelete = () => {
-    console.log("Usuario eliminado:", selectedUser);
-    setIsConfirmOpen(false);
+    u.deleteUser(selectedUser.id)
+      .then(() => {
+        getUsers();
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setSelectedUser(null);
+        setIsConfirmOpen(false);
+      });
   };
 
   const paginatedUsers = users.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
+
+  function getUsers() {
+    u.getAllUsers()
+      .then((response) => {
+        setUsers(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
+  useEffect(getUsers, []);
 
   return (
     <div className="p-6 bg-[#fffffc]">
@@ -132,11 +112,10 @@ export default function Users() {
                 <TableCell>{user.role.name}</TableCell>
                 <TableCell>
                   <span
-                    className={`px-2 py-1 rounded-full text-sm ${
-                      user.status.name === "Activo"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-red-100 text-red-600"
-                    }`}
+                    className={`px-2 py-1 rounded-full text-sm ${user.status.name === "Activo"
+                      ? "bg-green-100 text-green-600"
+                      : "bg-red-100 text-red-600"
+                      }`}
                   >
                     {user.status.name}
                   </span>

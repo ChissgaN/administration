@@ -72,7 +72,7 @@ export async function update(req, res, next) {
 
 export async function remove(req, res, next) {
   try {
-    const user = await User.find(req.params.id);
+    const user = await User.findByPk(req.params.id);
     if (!user) {
       throw { message: "User not found", status: 404 };
     }

@@ -3,16 +3,16 @@ import { DataTypes, Model } from "sequelize";
 import { Status } from "./StatusModel.js";
 import { Role } from "./RoleModel.js";
 import { Client } from "./ClientModel.js";
-
+import getQuery from "../helpers/GetQuery.js";
 export class User extends Model {
   static async create(user) {
     try {
-      const request = await pool.request();
-      Object.entries(user).forEach(([key, value]) => {
-        request.input(key, value);
+      let query = "EXEC sp_register_user ";
+      query += getQuery(user);
+      await sequelize.query(query, {
+        replacements: user,
+        type: sequelize.QueryTypes.RAW,
       });
-
-      await request.execute("sp_register_user");
     } catch (error) {
       throw error;
     }
@@ -20,25 +20,26 @@ export class User extends Model {
 
   static async update(user) {
     try {
-      const request = await pool.request();
-      Object.entries(user).forEach(([key, value]) => {
-        request.input(key, value);
+      let query = "EXEC sp_update_user ";
+      query += getQuery(user);
+      await sequelize.query(query, {
+        replacements: user,
+        type: sequelize.QueryTypes.RAW,
       });
-
-      await request.execute("sp_update_user");
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
 
   static async remove(status_id, user_id) {
     try {
-      const request = await pool.request();
-      request.input("status_id", status_id);
-      request.input("user_id", user_id);
+      let query =
+        "EXEC sp_update_user_status  @status_id = :status_id, @user_id = :user_id";
 
-      await request.execute("sp_update_user_status");
+      await sequelize.query(query, {
+        replacements: { status_id, user_id },
+        type: sequelize.QueryTypes.RAW,
+      });
     } catch (error) {
       throw error;
     }
