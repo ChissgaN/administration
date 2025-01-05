@@ -7,7 +7,7 @@ import Confirm from "../Components/Confirm";
 import ActionButtons from "../Components/ActionButtons";
 import CreateCategories from "../Components/CategoriesComponents.jsx/CreateCategories";
 import EditCategories from "../Components/CategoriesComponents.jsx/EditCategories"; // Importa el componente EditCategories
-import { getAllCategories, createCategory, updateCategory, deleteCategory } from "../libs/axios/categories"
+import c from "../libs/axios/categories"
 
 export default function Categories() {
   const [page, setPage] = useState(0);
@@ -19,7 +19,7 @@ export default function Categories() {
   const [categories, setCategories] = useState([]); // Estado para almacenar las categorías
 
   const handleCreateCategory = (newCategory) => {
-    createCategory(newCategory)
+    c.createCategory(newCategory)
       .then((response) => {
         if (response.status === 201) {
           getCategories(); // Obtener las categorías actualizadas
@@ -31,7 +31,7 @@ export default function Categories() {
   };
 
   const handleUpdateCategory = (id, categoryName) => {
-    updateCategory(id, { name: categoryName })
+    c.updateCategory(id, { name: categoryName })
       .then((response) => {
         if (response.status === 200) {
           getCategories(); // Obtener las categorías actualizadas
@@ -62,7 +62,7 @@ export default function Categories() {
   };
 
   const handleConfirmDelete = () => {
-    deleteCategory(selectedCategory.id)
+    c.deleteCategory(selectedCategory.id)
       .then((response) => {
         if (response.status === 204) {
           getCategories();
@@ -82,7 +82,7 @@ export default function Categories() {
   );
 
   const getCategories = () => {
-    getAllCategories().then((response) => {
+    c.getAllCategories().then((response) => {
       setCategories(response.data); // Almacenar las categorías en el estado
     })
       .catch((error) => {

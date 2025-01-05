@@ -19,3 +19,11 @@ export const deleteCategory = async (id) => {
   const { data, status } = await instance.delete(`/categories/${id}`);
   return { data, status };
 };
+
+
+export default {
+  getAllCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+}
