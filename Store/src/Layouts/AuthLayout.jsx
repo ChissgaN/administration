@@ -6,6 +6,7 @@ import OrderHistory from "../Pages/OrderHistory";
 import { getProfile } from "../libs/axios/auth/getProfile";
 import { useEffect, useState } from "react";
 import { getAllStatus } from "../libs/axios/status/getAllStatus";
+
 const AuthLayout = () => {
   const [profile, setProfile] = useState({});
   const [status, setStatus] = useState([]);
@@ -27,8 +28,8 @@ const AuthLayout = () => {
       .catch((error) => {
         console.error(error);
       });
-  }, [navigate]);
 
+  }, []);
 
 
 

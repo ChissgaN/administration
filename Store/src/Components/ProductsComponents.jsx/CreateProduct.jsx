@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -12,7 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Dropzone from "react-dropzone";
-import { use } from "react";
+import { getAllCategories } from "../../libs/axios/categories"
 
 const schema = yup.object().shape({
   products_categories_id: yup.string().required("La categoría es requerida."),
@@ -33,6 +33,7 @@ const schema = yup.object().shape({
 });
 
 export default function CreateProduct({ open, onClose, onCreate }) {
+  const [categories, setCategories] = useState([]);
   const { control, handleSubmit, setValue, getValues, reset } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -58,6 +59,17 @@ export default function CreateProduct({ open, onClose, onCreate }) {
     reset();
   };
 
+  useEffect(() => {
+    getAllCategories()
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+  , []);
+  
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -77,10 +89,13 @@ export default function CreateProduct({ open, onClose, onCreate }) {
                   margin="normal"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
-                >
-                  <MenuItem value="1">Electrodomésticos</MenuItem>
-                  <MenuItem value="2">Ropa</MenuItem>
-                  <MenuItem value="3">Zapatos</MenuItem>
+                > 
+                  {categories.map((category) => (
+                    <MenuItem key={category.id} value={category.id}>
+                      {category.name}
+                    </MenuItem>
+                  ))}
+ 
                 </TextField>
               )}
             />

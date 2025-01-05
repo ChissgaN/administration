@@ -15,10 +15,8 @@ import ActionButtons from "../Components/ActionButtons";
 import Confirm from "../Components/Confirm";
 import CreateProduct from "../Components/ProductsComponents.jsx/CreateProduct";
 import EditProduct from "../Components/ProductsComponents.jsx/EditProduct";
-import { getAllProducts } from "../libs/axios/products/getAllProducts";
-import { createNewProduct } from "../libs/axios/products/createNewProduct";
-import { updateProduct } from "../libs/axios/products/updateProduct";
-import { deleteProduct } from "../libs/axios/products/deleteProduct";
+
+import p from "../libs/axios/products";
 
 const base_api_url = import.meta.env.VITE_BASE_API_URL;
 
@@ -38,7 +36,7 @@ export default function Products() {
   };
 
   const handleSaveProduct = (updatedProduct) => {
-    updateProduct(productToEdit.id, updatedProduct)
+    p.updateProduct(productToEdit.id, updatedProduct)
       .then((rs) => {
         if (rs.status === 200) {
           getProducts();
@@ -54,7 +52,7 @@ export default function Products() {
   };
 
   const handleCreateProduct = async (newProduct) => {
-    const response = await createNewProduct(newProduct);
+    const response = await p.createNewProduct(newProduct);
     if (response.status === 201) {
       getProducts();
     }
@@ -76,7 +74,7 @@ export default function Products() {
   };
 
   const handleConfirmDelete = () => {
-    deleteProduct(selectedProduct.id)
+    p.deleteProduct(selectedProduct.id)
       .then((rs) => {
         if (rs.status === 200) {
           getProducts();
@@ -93,7 +91,7 @@ export default function Products() {
   );
 
   function getProducts() {
-    getAllProducts().then((rs) => {
+    p.getAllProducts().then((rs) => {
       setProductos(rs);
     })
       .catch((error) => {
