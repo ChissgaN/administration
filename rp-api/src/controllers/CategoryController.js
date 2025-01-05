@@ -66,7 +66,7 @@ export async function update(req, res, next) {
 
 export async function remove(req, res, next) {
   try {
-    const category = await Category.find(req.params.id);
+    const category = await Category.findByPk(req.params.id);
     if (!category) {
       throw { message: "Category not found", status: 404 };
     }

@@ -7,7 +7,7 @@ import Confirm from "../Components/Confirm";
 import ActionButtons from "../Components/ActionButtons";
 import CreateCategories from "../Components/CategoriesComponents.jsx/CreateCategories";
 import EditCategories from "../Components/CategoriesComponents.jsx/EditCategories"; // Importa el componente EditCategories
-import { getAllCategories, createCategory, updateCategory } from "../libs/axios/categories"
+import { getAllCategories, createCategory, updateCategory, deleteCategory } from "../libs/axios/categories"
 
 export default function Categories() {
   const [page, setPage] = useState(0);
@@ -62,8 +62,18 @@ export default function Categories() {
   };
 
   const handleConfirmDelete = () => {
-    console.log("Categoría eliminada:", selectedCategory);
-    setIsConfirmOpen(false);
+    deleteCategory(selectedCategory.id)
+      .then((response) => {
+        if (response.status === 204) {
+          getCategories();
+        }
+      })
+      .catch((error) => {
+        console.error("Error al eliminar la categoría:", error);
+      })
+      .finally(() => {
+        setIsConfirmOpen(false);
+      });
   };
 
   const paginatedCategories = categories.slice(

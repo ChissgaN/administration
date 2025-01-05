@@ -31,11 +31,12 @@ export class Category extends Model {
     }
   }
 
-  static async remove(status_id, product_id) {
+  static async remove(status_id, category_id) {
     try {
-      let query = "EXEC sp_delete_products_categories @status_id = :status_id, @product_id = :product_id";
+      let query =
+        "EXEC sp_update_products_categories_status @status_id = :status_id, @products_categories_id = :category_id";
       await sequelize.query(query, {
-        replacements: { status_id, product_id },
+        replacements: { status_id, category_id },
         type: sequelize.QueryTypes.RAW,
       });
     } catch (error) {
