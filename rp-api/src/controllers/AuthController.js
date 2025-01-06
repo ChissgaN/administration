@@ -1,4 +1,3 @@
-import { findBy } from "../models/AuthModel.js";
 import { User } from "../models/UserModel.js";
 import { appConfig } from "../config/app_config.js";
 import jwt from "jsonwebtoken";
@@ -7,7 +6,10 @@ import { compare } from "bcrypt";
 export async function login(req, res, next) {
   const { email, password } = req.body;
 
-  const user = await findBy("email", email);
+  const user = await User.findOne({
+    where: { email },
+    include: ["role", "status"],
+  });
 
   try {
     if (!user || user["status"]["name"].toLowerCase() === "inactivo") {
