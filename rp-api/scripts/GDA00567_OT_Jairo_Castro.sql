@@ -404,120 +404,119 @@ BEGIN
 END
 GO
 
--- Create a new stored procedure called 'sp_create_client' in schema 'SchemaName'
--- Drop the stored procedure if it already exists
-IF EXISTS (
-SELECT *
-FROM INFORMATION_SCHEMA.ROUTINES
-WHERE SPECIFIC_SCHEMA = N'GDA00567_OT_Jairo_Castro'
-    AND SPECIFIC_NAME = N'sp_create_client'
-)
-DROP PROCEDURE sp_create_client
-GO
--- Create the stored procedure in the specified schema
-CREATE PROCEDURE sp_create_client
-    @social_reason VARCHAR(245),
-    @comertial_name VARCHAR(245),
-    @delivery_address VARCHAR(45),
-    @phone_number VARCHAR(45),
-    @email VARCHAR(45)
-
-AS
-BEGIN
-    INSERT INTO clients
-        (social_reason, comertial_name, delivery_address, phone_number, email)
-    VALUES
-        (@social_reason, @comertial_name, @delivery_address, @phone_number, @email)
-END
-GO
-
--- Create a new stored procedure called 'sp_update_client' in schema 'SchemaName'
--- Drop the stored procedure if it already exists
-IF EXISTS (
-SELECT *
-FROM INFORMATION_SCHEMA.ROUTINES
-WHERE SPECIFIC_SCHEMA = N'GDA00567_OT_Jairo_Castro'
-    AND SPECIFIC_NAME = N'sp_update_client'
-)
-DROP PROCEDURE sp_update_client
-GO
--- Create the stored procedure in the specified schema
-CREATE PROCEDURE sp_update_client
-    @social_reason VARCHAR(245),
-    @comertial_name VARCHAR(245),
-    @delivery_address VARCHAR(45),
-    @phone_number VARCHAR(45),
-    @email VARCHAR(45),
-    @client_id INT
-
-AS
-BEGIN
-    UPDATE clients
-    SET social_reason = @social_reason,
-        comertial_name = @comertial_name,
-        delivery_address = @delivery_address,
-        phone_number = @phone_number,
-        email = @email
-    WHERE id = @client_id
-END
-GO
-
 -- Create a new stored procedure called 'sp_register_user' in schema 'SchemaName'
 -- Drop the stored procedure if it already exists
-IF EXISTS (
-SELECT *
-FROM INFORMATION_SCHEMA.ROUTINES
-WHERE SPECIFIC_SCHEMA = N'GDA00567_OT_Jairo_Castro'
-    AND SPECIFIC_NAME = N'sp_register_user'
-)
-DROP PROCEDURE sp_register_user
+
+DROP PROCEDURE IF EXISTS sp_register_user
 GO
 -- Create the stored procedure in the specified schema
 CREATE PROCEDURE sp_register_user
     @role_id INT,
-    @status_id INT,
-    @email VARCHAR(100),
-    @password VARCHAR(150),
-    @phone_number VARCHAR(45),
-    @birth_date DATE
-AS
-BEGIN
-    INSERT INTO users
-        (role_id, status_id, email, password, phone_number, birth_date)
-    VALUES
-        (@role_id, @status_id, @email, @password, @phone_number, @birth_date)
-END
-GO
-
--- Create a new stored procedure called 'sp_update_user' in schema 'SchemaName'
--- Drop the stored procedure if it already exists
-IF EXISTS (
-SELECT *
-FROM INFORMATION_SCHEMA.ROUTINES
-WHERE SPECIFIC_SCHEMA = N'GDA00567_OT_Jairo_Castro'
-    AND SPECIFIC_NAME = N'sp_update_user'
-)
-DROP PROCEDURE sp_update_user
-GO
--- Create the stored procedure in the specified schema
-CREATE PROCEDURE sp_update_user
-    @role_id INT,
+    @status_id INT = 1,
     @email VARCHAR(100),
     @password VARCHAR(150),
     @phone_number VARCHAR(45),
     @birth_date DATE,
-    @user_id INT
+    @social_reason VARCHAR(245) = NULL,
+    @comertial_name VARCHAR(245) = NULL,
+    @delivery_address VARCHAR(45) = NULL
 AS
 BEGIN
+    IF @role_id = 2
+    BEGIN
+        IF @social_reason IS NULL OR @comertial_name IS NULL OR @delivery_address IS NULL
+        BEGIN
+            RAISERROR ('social_reason, comertial_name, delivery_address are required for clients', 16, 1);
+            RETURN;
+        END
+    END
+
+    INSERT INTO users
+        (role_id, status_id, email, password, phone_number, birth_date)
+    VALUES
+        (@role_id, @status_id, @email, @password, @phone_number, @birth_date);
+
+    DECLARE @user_id INT;
+    SET @user_id = SCOPE_IDENTITY();
+
+    IF @role_id = 2
+    BEGIN
+        INSERT INTO clients
+            (user_id, social_reason, comertial_name, delivery_address)
+        VALUES
+            (@user_id, @social_reason, @comertial_name, @delivery_address);
+    END
+END
+GO
+
+
+DROP PROCEDURE IF EXISTS sp_update_user
+GO
+-- Create the stored procedure in the specified schema
+CREATE PROCEDURE sp_update_user
+    @user_id INT,
+    @role_id INT,
+    @status_id INT = 1,
+    @email VARCHAR(100),
+    @password VARCHAR(150),
+    @phone_number VARCHAR(45),
+    @birth_date DATE,
+    @social_reason VARCHAR(245) = NULL,
+    @comertial_name VARCHAR(245) = NULL,
+    @delivery_address VARCHAR(45) = NULL
+AS
+BEGIN
+    IF @role_id = 2
+    BEGIN
+        IF @social_reason IS NULL OR @comertial_name IS NULL OR @delivery_address IS NULL
+        BEGIN
+            RAISERROR ('social_reason, comertial_name, delivery_address are required for clients', 16, 1);
+            RETURN;
+        END
+    END
+
     UPDATE users
-    SET role_id = @role_id,
+    SET
+        role_id = @role_id,
+        status_id = @status_id,
         email = @email,
         password = @password,
         phone_number = @phone_number,
         birth_date = @birth_date
-    WHERE id = @user_id
+    WHERE
+        id = @user_id;
+
+    IF @role_id = 2
+    BEGIN
+        IF EXISTS (SELECT 1
+        FROM clients
+        WHERE user_id = @user_id)
+        BEGIN
+            UPDATE clients
+            SET
+                social_reason = @social_reason,
+                comertial_name = @comertial_name,
+                delivery_address = @delivery_address
+            WHERE
+                user_id = @user_id;
+        END
+        ELSE
+        BEGIN
+            INSERT INTO clients
+                (user_id, social_reason, comertial_name, delivery_address)
+            VALUES
+                (@user_id, @social_reason, @comertial_name, @delivery_address);
+        END
+    END
+    ELSE
+    BEGIN
+        DELETE FROM clients WHERE user_id = @user_id;
+    END
 END
 GO
+
+
+
 
 -- Create a new stored procedure called 'sp_update_user_status' in schema 'SchemaName'
 -- Drop the stored procedure if it already exists
@@ -817,45 +816,6 @@ BEGIN
     UPDATE products
     SET status_id = @status_id
     WHERE id = @product_id
-END
-GO
-
--- Create a new stored procedure called 'sp_update_order_details' in schema 'SchemaName'
--- Drop the stored procedure if it already exists
-IF EXISTS (
-SELECT *
-FROM INFORMATION_SCHEMA.ROUTINES
-WHERE SPECIFIC_SCHEMA = N'GDA00567_OT_Jairo_Castro'
-    AND SPECIFIC_NAME = N'sp_update_order_details'
-)
-DROP PROCEDURE sp_update_order_details
-GO
--- Create the stored procedure in the specified schema
-CREATE PROCEDURE sp_update_order_details
-    @quantity INT,
-    @subtotal FLOAT,
-    @total_order FLOAT,
-    @order_id INT
-AS
-BEGIN
-    BEGIN TRANSACTION
-
-    BEGIN TRY
-        UPDATE order_details
-        SET quantity = @quantity,
-            subtotal = @subtotal
-        WHERE order_id = @order_id
-
-        UPDATE [order]
-        SET total_order = @total_order
-        WHERE id = @order_id
-
-        COMMIT TRANSACTION
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION
-        THROW
-    END CATCH
 END
 GO
 
