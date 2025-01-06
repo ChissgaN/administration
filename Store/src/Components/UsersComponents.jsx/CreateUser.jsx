@@ -1,161 +1,221 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  MenuItem,
+  Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, MenuItem,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { addYears } from "date-fns";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-// Esquema de validación con Yup
+
+
 const schema = yup.object().shape({
-  email: yup
-    .string()
-    .email("Debe ingresar un correo válido")
-    .required("El correo es obligatorio"),
-  password: yup
-    .string()
-    .min(6, "La contraseña debe tener al menos 6 caracteres")
-    .required("La contraseña es obligatoria"),
-  phone_number: yup.string().required("El número de teléfono es obligatorio"),
-  birth_date: yup
-    .date()
-    .nullable()
-    .required("La fecha de nacimiento es obligatoria")
-    .test(
-      "is-over-18",
-      "Debes ser mayor de 18 años",
-      (value) => value && addYears(value, 18) <= new Date()
-    ),
-  role: yup
-    .number()
-    .required("Debes seleccionar un rol")
-    .oneOf([1, 2], "Rol no válido"),
+  role_id: yup.string().required("El rol es requerido."),
+  email: yup.string().email().required("Debes ingresar un correo válido."),
+  password: yup.string().min(6).required("La contraseña es requerida."),
+  phone_number: yup.string().required("El número de teléfono es requerido."),
+  birth_date: yup.string().transform((value, originalValue) => {
+    return originalValue ? new Date(originalValue).toISOString().split('T')[0] : value;
+  }).required("La fecha de nacimiento es requerida."),
+  social_reason: yup.string().required("La razón social es requerida."),
+  comertial_name: yup.string().required("El nombre comercial es requerido."),
+  delivery_address: yup.string().required("La dirección de entrega es requerida."),
 });
 
-const CreateUser = ({ open, onClose, onSubmit }) => {
-  const { register, handleSubmit, control, formState: { errors } } = useForm({
+export default function CreateUser({ open, onClose, onCreate }) {
+
+  const { control, handleSubmit, reset, watch } = useForm({
     resolver: yupResolver(schema),
-    mode: "onChange",
-    reValidateMode: "onChange",
+    defaultValues: {
+      role_id: "",
+      email: "",
+      password: "",
+      phone_number: "",
+      birth_date: "",
+    }
   });
 
-  const handleFormSubmit = (data) => {
-    onSubmit(data);
+  const onSubmit = (data) => {
+    onCreate(data);
     onClose();
+    reset();
   };
 
+  const role_id = watch("role_id");
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Crear Usuario</DialogTitle>
-      <DialogContent>
-        <form
-          onSubmit={handleSubmit(handleFormSubmit)}
-          noValidate
-          className="flex flex-col gap-6"
-        >
-          {/* Email y Contraseña */}
-          <div className="flex justify-around gap-4">
-            <TextField
-              label="Correo Electrónico"
-              fullWidth
-              margin="dense"
-              {...register("email")}
-              error={!!errors.email}
-              helperText={errors.email?.message}
-            />
-            <TextField
-              label="Contraseña"
-              type="password"
-              fullWidth
-              margin="dense"
-              {...register("password")}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-            />
-          </div>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle className="text-[#ed217c] font-bold">Crear Usuario</DialogTitle>
+      <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
+        <DialogContent sx={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '1rem',
+        }}>
 
-          <div className="flex justify-around gap-4 items-center">
-          <TextField
-              select
-              label="Rol"
-              className="w-[47%]"
-              margin="dense"
-              defaultValue=""
-              {...register("role")}
-              error={!!errors.role}
-              helperText={errors.role?.message}
-            >
-              <MenuItem value={1}>Operador</MenuItem>
-              <MenuItem value={2}>Cliente</MenuItem>
-            </TextField>
-          
-            <Controller
-              name="birth_date" margin="dense"
-              control={control}
-              defaultValue={null}
-              render={({ field }) => (
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DatePicker
-                    {...field}
-                    onChange={(date) => field.onChange(date)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Fecha de Nacimiento"
-                        fullWidth
-                        margin="dense"
-                        error={!!errors.birth_date}
-                        helperText={errors.birth_date?.message}
-                      />
-                    )}
-                  />
-                </LocalizationProvider>
-              )}
-            />
+          <Controller
+            name="role_id"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                select
+                label="Rol"
+                fullWidth
+                margin="normal"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+              >
+                {roles.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))}
 
-          </div>
-          <div className="flex justify-center mx-auto">
+              </TextField>
+            )}
+          />
+
+          <Controller
+            name="email"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Correo Electrónico"
+                fullWidth
+                margin="normal"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
+
+
+          <Controller
+            name="password"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Contraseña"
+                type="password"
+                fullWidth
+                margin="normal"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+              />
+            )}
+          />
           <Controller
             name="phone_number"
             control={control}
             defaultValue=""
-            render={({ field }) => (
-              <PhoneInput
+            render={({ field, fieldState }) => (
+              <TextField
                 {...field}
-                country={"gt"}
-                inputClass={`w-full h-full  ${errors.phone_number ? "border-red-500" : "border-gray-300"}`}
-                className=""
+                label="phone_number"
+                type="tel"
+                fullWidth
+                margin="normal"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
               />
             )}
           />
-          {errors.phone_number && (
-            <p className="mt-1 text-sm text-red-500">{errors.phone_number.message}</p>
-          )}
 
-          </div>
-        </form>
-      </DialogContent>
-      <DialogActions className="my-4 ">
-        <Button onClick={onClose} color="error" variant="contained">
-          Cancelar
-        </Button>
-        <Button onClick={handleSubmit(handleFormSubmit)} variant="contained" color="primary">
-          Crear Usuario
-        </Button>
-      </DialogActions>
+
+
+          <Controller
+            name="birth_date"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                type="date"
+                fullWidth
+                margin="normal"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                sx={role_id !== 2 && { gridColumn: 'span 2' }}
+              />
+            )}
+          />
+          {role_id === 2 &&
+            <>
+
+              <Controller
+                name="social_reason"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Razón Social"
+                    fullWidth
+                    margin="normal"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                // ocupa dos columnas
+                name="comertial_name"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Nombre Comercial"
+                    fullWidth
+                    sx={{ gridColumn: 'span 2' }}
+                    margin="normal"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="delivery_address"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Dirección de Entrega"
+                    fullWidth
+                    sx={{ gridColumn: 'span 2' }}
+                    margin="normal"
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                  />
+                )}
+              />
+
+            </>
+          }
+
+        </DialogContent>
+
+        <DialogActions className="my-4 ">
+          <Button onClick={onClose} color="error" variant="contained" >
+            Cancelar
+          </Button>
+          <Button type="submit" variant="contained" color="primary">
+            Crear Producto
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
-};
+}
 
-export default CreateUser;
+const roles = [
+  {
+    id: 1,
+    name: "Operador"
+  },
+  {
+    id: 2,
+    name: "Cliente"
+  }
+]

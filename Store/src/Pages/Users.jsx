@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button,
 } from "@mui/material";
@@ -28,11 +28,26 @@ export default function Users() {
   };
 
   const handleCreateUser = (data) => {
-    console.log("Usuario creado:", data);
+    u.createUser(data)
+      .then(() => {
+        getUsers();
+      })
+      .catch((error) => {
+        console.error(error);
+      })
   };
 
   const handleEditUser = (data) => {
-    console.log("Usuario editado:", data);
+    u.updateUser(selectedUser.id, data)
+      .then(() => {
+        getUsers();
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setSelectedUser(null);
+      });
   };
 
   const handleEditClick = (user) => {
@@ -165,13 +180,13 @@ export default function Users() {
       <CreateUser
         open={isCreateDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
-        onSubmit={handleCreateUser}
+        onCreate={handleCreateUser}
       />
       <EditUser
         open={isEditDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        onSubmit={handleEditUser}
-        user={selectedUser}
+        onUpdate={handleEditUser}
+        user_id={selectedUser?.id}
       />
     </div>
   );
