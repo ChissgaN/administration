@@ -9,13 +9,13 @@ import {
   Paper,
   TablePagination,
   Button,
+  TextField,
 } from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import ActionButtons from "../Components/ActionButtons";
 import Confirm from "../Components/Confirm";
 import CreateProduct from "../Components/ProductsComponents.jsx/CreateProduct";
 import EditProduct from "../Components/ProductsComponents.jsx/EditProduct";
-
 import p from "../libs/axios/products";
 
 const base_api_url = import.meta.env.VITE_BASE_API_URL;
@@ -29,6 +29,7 @@ export default function Products() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState(null);
   const [productos, setProductos] = useState([]);
+  const [searchText, setSearchText] = useState("");
 
   const handleEditClick = (producto) => {
     setProductToEdit(producto);
@@ -41,7 +42,8 @@ export default function Products() {
         if (rs.status === 200) {
           getProducts();
         }
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.error(error);
       });
     setIsEditDialogOpen(false);
@@ -79,42 +81,60 @@ export default function Products() {
         if (rs.status === 200) {
           getProducts();
         }
-      }).catch((error) => {
+      })
+      .catch((error) => {
         console.error(error);
       });
     setIsConfirmOpen(false);
   };
 
-  const paginatedProducts = productos.slice(
+  const getProducts = () => {
+    p.getAllProducts()
+      .then((rs) => {
+        setProductos(rs);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  useEffect(getProducts, []);
+
+  const filteredProducts = productos.filter(
+    (producto) =>
+      producto.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      producto.category.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  const paginatedProducts = filteredProducts.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
 
-  function getProducts() {
-    p.getAllProducts().then((rs) => {
-      setProductos(rs);
-    })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-
-  useEffect(getProducts, []);
-
-
   return (
     <div className="p-6 bg-[#fffffc]">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 gap-4">
         <h1 className="text-2xl font-bold text-[#19535f]">Productos</h1>
-        <Button
-          variant="contained"
-          className="bg-[#9381ff] text-white hover:bg-[#7c6bd0] px-4 py-2 rounded-md flex items-center"
-          startIcon={<FaPlus />}
-          onClick={handleCreateClick}
-        >
-          Crear Producto
-        </Button>
+        <div className="flex justify-end gap-4 w-[60%]">
+          <TextField
+            size="small"
+            variant="outlined"
+            label="Buscar por nombre o categoría"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="mb-4 w-[32%]  rounded"
+          />
+          <Button
+            variant="contained"
+            className="bg-[#9381ff] text-white hover:bg-[#7c6bd0]  px-4 py-2 rounded-md flex items-center"
+            startIcon={<FaPlus />}
+            onClick={handleCreateClick}
+          >
+            Crear Producto
+          </Button>
+        </div>
       </div>
+
       <TableContainer component={Paper} className="shadow-lg">
         <Table>
           <TableHead className="bg-[#9381ff]">
@@ -131,9 +151,17 @@ export default function Products() {
               <TableRow key={producto.id} className="hover:bg-gray-100">
                 <TableCell>{producto.id}</TableCell>
                 <TableCell>
-
                   <div className="w-12 h-12 bg-[#beb7a4] flex items-center justify-center rounded-md text-sm">
-                    {producto.photo ? <img src={base_api_url + `/${producto.photo}`} alt={producto.photo} className="w-full h-full object-cover object-top" width={40} /> : "No image"}
+                    {producto.photo ? (
+                      <img
+                        src={base_api_url + `/${producto.photo}`}
+                        alt={producto.photo}
+                        className="w-full h-full object-cover object-top"
+                        width={40}
+                      />
+                    ) : (
+                      "No image"
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>{producto.name}</TableCell>
@@ -168,7 +196,7 @@ export default function Products() {
       </TableContainer>
       <TablePagination
         component="div"
-        count={productos.length}
+        count={filteredProducts.length}
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
@@ -209,4 +237,4 @@ const tableHeader = [
   "Stock",
   "Precio",
   "Acciones",
-]
+];

@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TablePagination,
+  Button,
+  TextField,
 } from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import Confirm from "../Components/Confirm";
 import ActionButtons from "../Components/ActionButtons";
 import CreateCategories from "../Components/CategoriesComponents.jsx/CreateCategories";
-import EditCategories from "../Components/CategoriesComponents.jsx/EditCategories"; // Importa el componente EditCategories
-import c from "../libs/axios/categories"
+import EditCategories from "../Components/CategoriesComponents.jsx/EditCategories";
+import c from "../libs/axios/categories";
 
 export default function Categories() {
   const [page, setPage] = useState(0);
@@ -16,13 +25,14 @@ export default function Categories() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [categories, setCategories] = useState([]); // Estado para almacenar las categorías
+  const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleCreateCategory = (newCategory) => {
     c.createCategory(newCategory)
       .then((response) => {
         if (response.status === 201) {
-          getCategories(); // Obtener las categorías actualizadas
+          getCategories();
         }
       })
       .catch((error) => {
@@ -34,7 +44,7 @@ export default function Categories() {
     c.updateCategory(id, { name: categoryName })
       .then((response) => {
         if (response.status === 200) {
-          getCategories(); // Obtener las categorías actualizadas
+          getCategories();
         }
       })
       .catch((error) => {
@@ -52,8 +62,8 @@ export default function Categories() {
   };
 
   const handleEditClick = (category) => {
-    setSelectedCategory(category); // Establecer la categoría seleccionada
-    setIsEditDialogOpen(true); // Abrir el formulario de edición
+    setSelectedCategory(category);
+    setIsEditDialogOpen(true);
   };
 
   const handleDeleteClick = (category) => {
@@ -76,34 +86,52 @@ export default function Categories() {
       });
   };
 
-  const paginatedCategories = categories.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
   const getCategories = () => {
-    c.getAllCategories().then((response) => {
-      setCategories(response.data); // Almacenar las categorías en el estado
-    })
+    c.getAllCategories()
+      .then((response) => {
+        setCategories(response.data);
+      })
       .catch((error) => {
         console.error("Error al obtener las categorías:", error);
       });
-  }
+  };
 
   useEffect(getCategories, []);
+
+  const filteredCategories = categories.filter((category) => {
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return (
+      category.name.toLowerCase().includes(lowerSearchTerm) ||
+      category.user.email.toLowerCase().includes(lowerSearchTerm)
+    );
+  });
+
+  const paginatedCategories = filteredCategories.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <div className="p-6 bg-[#fffffc]">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-[#19535f]">Categorías</h1>
-        <Button
-          variant="contained"
-          className="bg-[#9381ff] text-white hover:bg-[#7c6bd0] px-4 py-2 rounded-md flex items-center"
-          startIcon={<FaPlus />}
-          onClick={() => setIsCreateDialogOpen(true)}
-        >
-          Crear Categoría
-        </Button>
+        <div className="flex items-center space-x-4">
+          <TextField
+            variant="outlined"
+            size="small"
+            label="Buscar por nombre o usuario"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Button
+            variant="contained"
+            className="bg-[#9381ff] text-white hover:bg-[#7c6bd0] px-4 py-2 rounded-md flex items-center"
+            startIcon={<FaPlus />}
+            onClick={() => setIsCreateDialogOpen(true)}
+          >
+            Crear Categoría
+          </Button>
+        </div>
       </div>
       <TableContainer component={Paper} className="shadow-lg">
         <Table>
@@ -124,10 +152,11 @@ export default function Categories() {
                 <TableCell>{category.user.email}</TableCell>
                 <TableCell>
                   <span
-                    className={`px-2 py-1 rounded-full text-sm ${category.status.name === "Activo"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-red-100 text-red-600"
-                      }`}
+                    className={`px-2 py-1 rounded-full text-sm ${
+                      category.status.name === "Activo"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-red-100 text-red-600"
+                    }`}
                   >
                     {category.status.name}
                   </span>
@@ -158,7 +187,7 @@ export default function Categories() {
       </TableContainer>
       <TablePagination
         component="div"
-        count={categories.length}
+        count={filteredCategories.length}
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
@@ -174,21 +203,17 @@ export default function Categories() {
         itemName={selectedCategory?.name}
         itemType="categoría"
       />
-
       <CreateCategories
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
         onCreate={handleCreateCategory}
       />
-
-
       <EditCategories
         open={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         category={selectedCategory}
         onUpdate={handleUpdateCategory}
       />
-
     </div>
   );
 }

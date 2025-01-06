@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Button, TextField,
 } from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import ActionButtons from "../Components/ActionButtons";
@@ -8,7 +8,6 @@ import Confirm from "../Components/Confirm";
 import CreateUser from "../Components/UsersComponents.jsx/CreateUser";
 import EditUser from "../Components/UsersComponents.jsx/EditUser";
 import u from "../libs/axios/users";
-
 
 export default function Users() {
   const [page, setPage] = useState(0);
@@ -18,6 +17,8 @@ export default function Users() {
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [users, setUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -74,10 +75,13 @@ export default function Users() {
       });
   };
 
-  const paginatedUsers = users.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  const paginatedUsers = users
+    .filter(
+      (user) =>
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.role.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   function getUsers() {
     u.getAllUsers()
@@ -95,14 +99,23 @@ export default function Users() {
     <div className="p-6 bg-[#fffffc]">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-[#19535f]">Usuarios</h1>
-        <Button
-          variant="contained"
-          className="bg-[#9381ff] text-white hover:bg-[#7c6bd0] px-4 py-2 rounded-md flex items-center"
-          startIcon={<FaPlus />}
-          onClick={() => setCreateDialogOpen(true)}
-        >
-          Crear Usuario
-        </Button>
+        <div className="flex items-center gap-4">
+          <TextField
+            label="Buscar por email o rol" 
+            variant="outlined"
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Button
+            variant="contained"
+            className="bg-[#9381ff] text-white hover:bg-[#7c6bd0] px-4 py-2 rounded-md flex items-center"
+            startIcon={<FaPlus />}
+            onClick={() => setCreateDialogOpen(true)}
+          >
+            Crear Usuario
+          </Button>
+        </div>
       </div>
       <TableContainer component={Paper} className="shadow-lg">
         <Table>
@@ -127,10 +140,11 @@ export default function Users() {
                 <TableCell>{user.role.name}</TableCell>
                 <TableCell>
                   <span
-                    className={`px-2 py-1 rounded-full text-sm ${user.status.name === "Activo"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-red-100 text-red-600"
-                      }`}
+                    className={`px-2 py-1 rounded-full text-sm ${
+                      user.status.name === "Activo"
+                        ? "bg-green-100 text-green-600"
+                        : "bg-red-100 text-red-600"
+                    }`}
                   >
                     {user.status.name}
                   </span>
