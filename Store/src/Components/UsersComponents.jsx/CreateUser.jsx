@@ -16,9 +16,6 @@ const schema = yup.object().shape({
   birth_date: yup.string().transform((value, originalValue) => {
     return originalValue ? new Date(originalValue).toISOString().split('T')[0] : value;
   }).required("La fecha de nacimiento es requerida."),
-  social_reason: yup.string().required("La razón social es requerida."),
-  comertial_name: yup.string().required("El nombre comercial es requerido."),
-  delivery_address: yup.string().required("La dirección de entrega es requerida."),
 });
 
 export default function CreateUser({ open, onClose, onCreate }) {
@@ -140,59 +137,55 @@ export default function CreateUser({ open, onClose, onCreate }) {
               />
             )}
           />
-          {role_id === 2 &&
-            <>
 
-              <Controller
-                name="social_reason"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    label="Razón Social"
-                    fullWidth
-                    margin="normal"
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
+          <Controller
+            name="social_reason"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Razón Social"
+                fullWidth
+                margin="normal"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                sx={{ display: role_id !== 2 ? "none" : "block"}}
               />
+            )}
+          />
 
-              <Controller
-                // ocupa dos columnas
-                name="comertial_name"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    label="Nombre Comercial"
-                    fullWidth
-                    sx={{ gridColumn: 'span 2' }}
-                    margin="normal"
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
+          <Controller
+            // ocupa dos columnas
+            name="comertial_name"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Nombre Comercial"
+                fullWidth
+                margin="normal"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                sx={{ display: role_id !== 2 ? "none" : "block", gridColumn: 'span 2' }}
               />
+            )}
+          />
 
-              <Controller
-                name="delivery_address"
-                control={control}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    {...field}
-                    label="Dirección de Entrega"
-                    fullWidth
-                    sx={{ gridColumn: 'span 2' }}
-                    margin="normal"
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
+          <Controller
+            name="delivery_address"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                {...field}
+                label="Dirección de Entrega"
+                fullWidth
+                margin="normal"
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                sx={{ display: role_id !== 2 ? "none" : "block", gridColumn: 'span 2' }}
               />
-
-            </>
-          }
+            )}
+          />
 
         </DialogContent>
 
