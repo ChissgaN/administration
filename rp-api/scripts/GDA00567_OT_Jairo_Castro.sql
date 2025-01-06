@@ -3,12 +3,10 @@
 USE master
 
 -- Create the new database if it does not exist already
-IF NOT EXISTS (     
-    SELECT name
-FROM sys.databases
-WHERE name = N'GDA00567_OT_Jairo_Castro'
-)
-CREATE DATABASE GDA00567_OT_Jairo_Castro
+DROP DATABASE IF EXISTS GDA00567_OT_Jairo_Castro;
+GO
+
+CREATE DATABASE GDA00567_OT_Jairo_Castro;
 GO
 
 USE GDA00567_OT_Jairo_Castro;
@@ -831,7 +829,7 @@ FROM sys.views
 WHERE sys.schemas.name = N'USE GDA00567_OT_Jairo_Castro;'
     AND sys.views.name = N'total_active_products'
 )
-DROP VIEW SchemaName.total_active_products
+DROP VIEW total_active_products
 GO
 -- Create the view in the specified schema
 CREATE VIEW total_active_products
@@ -852,7 +850,7 @@ FROM sys.views
 WHERE sys.schemas.name = N'USE GDA00567_OT_Jairo_Castro;'
     AND sys.views.name = N'total_amount_per_month'
 )
- DROP VIEW SchemaName.total_amount_per_month
+ DROP VIEW total_amount_per_month
  GO
 --Create the view in the specified schema
 CREATE VIEW total_amount_per_month

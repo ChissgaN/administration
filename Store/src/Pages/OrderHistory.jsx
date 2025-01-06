@@ -4,7 +4,6 @@ import OrderDetails from "../Components/OrderDetails";
 import ActionButtons from "../Components/ActionButtons";
 import { FaEye, FaEdit } from "react-icons/fa";
 import { allOrders } from "../libs/axios/orders/allOrders";
-
 import { updateOrderStatus } from "../libs/axios/orders/updateOrderStatus";
 import { AuthContext } from "../context/AuthContext";
 
@@ -16,6 +15,7 @@ export default function OrderHistory() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(3);
   const [orders, setOrders] = useState([]);
+  const [filterStatus, setFilterStatus] = useState("");
 
   const handleView = (order) => {
     setSelectedOrder(order.id);
@@ -29,13 +29,12 @@ export default function OrderHistory() {
   const handleStatusChange = (orderId, newStatus) => {
     updateOrderStatus(orderId, newStatus)
       .then(() => {
-        getOrders()
+        getOrders();
         setDropdownOrderId(null);
       })
       .catch((error) => {
         console.error(error);
-      });;
-
+      });
   };
 
   const handleCloseModal = () => {
@@ -48,17 +47,18 @@ export default function OrderHistory() {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 3));
+    setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  // Filtrar datos según la página actual
-  const paginatedOrders = orders.slice(
+  const filteredOrders = filterStatus
+    ? orders.filter((order) => order.status.id === parseInt(filterStatus, 10))
+    : orders;
+
+  const paginatedOrders = filteredOrders.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
-
-
 
   function getOrders() {
     allOrders()
@@ -70,11 +70,23 @@ export default function OrderHistory() {
       });
   }
   useEffect(getOrders, []);
+
   return (
     <div className="p-6 bg-[#fffffc]">
-      <h1 className="text-2xl font-bold text-[#19535f] mb-4">
-        Historial de Órdenes
-      </h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold text-[#19535f]">Historial de Órdenes</h1>
+        <select
+          className="border border-[#9381ff] rounded px-4 py-2"
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <option value="">Todos los estados</option>
+          <option value="3" className="text-blue-600">Pendiente</option>
+          <option value="4" className="text-green-600">Entregado</option>
+          <option value="5" className="text-[#ed217c]">Cancelado</option>
+        </select>
+      </div>
+
       <table className="w-full border border-[#beb7a4]">
         <thead>
           <tr className="bg-[#9381ff]">
@@ -154,7 +166,7 @@ export default function OrderHistory() {
 
       <TablePagination
         component="div"
-        count={orders.length}
+        count={filteredOrders.length}
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
@@ -174,10 +186,9 @@ export default function OrderHistory() {
   );
 }
 
-
 const statusColor = {
   "5": "text-[#ed217c]",
   "3": "text-blue-600",
   "4": "text-green-600",
   "default": "text-gray-600",
-}
+};

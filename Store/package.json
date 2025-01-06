@@ -2,7 +2,7 @@
   "name": "store",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "type": "module", 
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@date-io/date-fns": "^3.2.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@hookform/resolvers": "^3.9.1",
@@ -19,7 +18,7 @@
     "@mui/x-date-pickers": "^7.23.3",
     "axios": "^1.7.9",
     "classnames": "^2.5.1",
-    "date-fns": "^2.29.3",
+    "date-fns": "^2.30.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.5",
