@@ -73,8 +73,6 @@ CREATE TABLE clients
     social_reason VARCHAR(245) NOT NULL,
     comertial_name VARCHAR(245) NOT NULL,
     delivery_address VARCHAR(45) NOT NULL,
-    phone_number VARCHAR(45) NOT NULL,
-    email VARCHAR(45) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
 );
 GO
@@ -458,7 +456,6 @@ CREATE PROCEDURE sp_update_user
     @role_id INT,
     @status_id INT = 1,
     @email VARCHAR(100),
-    @password VARCHAR(150),
     @phone_number VARCHAR(45),
     @birth_date DATE,
     @social_reason VARCHAR(245) = NULL,
@@ -480,7 +477,6 @@ BEGIN
         role_id = @role_id,
         status_id = @status_id,
         email = @email,
-        password = @password,
         phone_number = @phone_number,
         birth_date = @birth_date
     WHERE
