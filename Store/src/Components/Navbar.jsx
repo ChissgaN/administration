@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AiOutlineShop, AiOutlineMenu } from "react-icons/ai";
+import {
+  AiOutlineShop,
+  AiOutlineMenu,
+  AiOutlineShoppingCart,
+} from "react-icons/ai";
 import { Menu, MenuItem } from "@mui/material";
 import { logout } from "../libs/axios/auth/logout";
+import Modal from "@mui/material/Modal";
 import ShopCar from "./Shopcar";
 
 const Navbar = ({ rol_id }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
+
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -21,12 +29,18 @@ const Navbar = ({ rol_id }) => {
     setMenuOpen(!menuOpen);
   };
 
+  const handleCartOpen = () => {
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCartItems(storedCart);
+    setCartOpen(true);
+  };
+
   const handleLogout = async () => {
     const rs = await logout();
     if (rs.status === 200) {
       navigate("/login");
     }
-  }
+  };
 
   return (
     <nav className="bg-[#cbe896] shadow-md">
@@ -34,7 +48,6 @@ const Navbar = ({ rol_id }) => {
         <Link to="/" className="text-[#19535f] flex items-center text-3xl">
           <AiOutlineShop />
         </Link>
-
         {/* Opciones del navbar (pantallas grandes) */}
         <ul className="hidden sm:flex gap-8 text-[#19535f] font-medium">
           {rol_id === 1 ? (
@@ -45,12 +58,18 @@ const Navbar = ({ rol_id }) => {
                 </Link>
               </li>
               <li>
-                <Link to="/products" className="hover:text-[#ff7f11] transition">
+                <Link
+                  to="/products"
+                  className="hover:text-[#ff7f11] transition"
+                >
                   Productos
                 </Link>
               </li>
               <li>
-                <Link to="/categories" className="hover:text-[#ff7f11] transition">
+                <Link
+                  to="/categories"
+                  className="hover:text-[#ff7f11] transition"
+                >
                   Categorías
                 </Link>
               </li>
@@ -63,22 +82,29 @@ const Navbar = ({ rol_id }) => {
           ) : (
             <>
               <li>
-                <Link to="/inicio" className="hover:text-[#ff7f11] transition">
+                <Link to="/" className="hover:text-[#ff7f11] transition">
                   Inicio
                 </Link>
               </li>
               <li>
-                <Link to="/purchase-history" className="hover:text-[#ff7f11] transition">
+                <Link
+                  to="/purchase-history"
+                  className="hover:text-[#ff7f11] transition"
+                >
                   Historial de Compras
                 </Link>
               </li>
               <li>
-                <ShopCar />
+                <button
+                  onClick={handleCartOpen} // Abrir el modal del carrito y cargar productos
+                  className="text-[#19535f] hover:text-[#ff7f11] transition"
+                >
+                  <AiOutlineShoppingCart size={24} />
+                </button>
               </li>
             </>
           )}
         </ul>
-
         {/* Menú de Opciones a la derecha */}
         <div className="relative">
           <button
@@ -96,9 +122,7 @@ const Navbar = ({ rol_id }) => {
               <Link to="/perfil">Perfil</Link>
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
-              <button onClick={handleLogout}>
-                Cerrar Sesión
-              </button>
+              <button onClick={handleLogout}>Cerrar Sesión</button>
             </MenuItem>
           </Menu>
         </div>
@@ -120,7 +144,7 @@ const Navbar = ({ rol_id }) => {
               <>
                 <li>
                   <Link
-                    to="/inicio"
+                    to="/"
                     className="hover:text-[#ff7f11] transition"
                     onClick={toggleMobileMenu}
                   >
@@ -159,7 +183,7 @@ const Navbar = ({ rol_id }) => {
               <>
                 <li>
                   <Link
-                    to="/inicio"
+                    to="/"
                     className="hover:text-[#ff7f11] transition"
                     onClick={toggleMobileMenu}
                   >
@@ -176,13 +200,32 @@ const Navbar = ({ rol_id }) => {
                   </Link>
                 </li>
                 <li>
-                  <ShopCar />
+                  <button
+                    onClick={handleCartOpen} // Abrir el modal del carrito
+                    className="text-[#19535f] hover:text-[#ff7f11] transition"
+                  >
+                    <AiOutlineShoppingCart size={24} />
+                  </button>
                 </li>
               </>
             )}
           </ul>
         </div>
       )}
+
+      {/* Modal del carrito */}
+      <Modal
+        open={cartOpen}
+        onClose={() => setCartOpen(false)}
+        aria-labelledby="cart-modal-title"
+        aria-describedby="cart-modal-description"
+      >
+        <div
+          className="bg-white p-6 rounded-lg shadow-lg w-2/4 h-3/3 mx-auto mt-20"
+        >
+          <ShopCar cartItems={cartItems} />
+        </div>
+      </Modal>
     </nav>
   );
 };

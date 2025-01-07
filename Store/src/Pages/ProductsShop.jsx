@@ -1,39 +1,88 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import * as Yup from "yup";
-
-const products = [
-  { id: 1, name: "Producto A", brand: "Marca A", price: 50.5, stock: 10, products_categories_id: 1 },
-  { id: 2, name: "Producto B", brand: "Marca B", price: 75.0, stock: 5, products_categories_id: 1 },
-  { id: 3, name: "Producto C", brand: "Marca C", price: 20.99, stock: 8, products_categories_id: 1 },
-  { id: 4, name: "Producto D", brand: "Marca D", price: 100.0, stock: 2, products_categories_id: 1 },
-  { id: 5, name: "Producto E", brand: "Marca E", price: 35.75, stock: 15, products_categories_id: 1 },
-  { id: 6, name: "Producto F", brand: "Marca F", price: 10.0, stock: 20, products_categories_id: 1 },
-  { id: 7, name: "Producto G", brand: "Marca G", price: 15.0, stock: 10, products_categories_id: 2 },
-  { id: 8, name: "Producto H", brand: "Marca H", price: 20.0, stock: 5, products_categories_id: 2 },
-  { id: 9, name: "Producto I", brand: "Marca I", price: 25.0, stock: 8, products_categories_id: 2 },
-];
+import productAPI from "../libs/axios/products";
 
 const ProductsShop = () => {
+  const [cartItems, setCartItems] = useState([]);  // Estado local del carrito
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    productAPI
+      .getAllProducts()
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      });
+  }, []);
+
   const categorizedProducts = products.reduce((acc, product) => {
-    acc[product.products_categories_id] = acc[product.products_categories_id] || [];
-    acc[product.products_categories_id].push(product);
+    const categoryName = product.category?.name || "Sin categoría";
+    acc[categoryName] = acc[categoryName] || [];
+    
+    if (!acc[categoryName].some((p) => p.id === product.id)) {
+      acc[categoryName].push(product);
+    }
+    
     return acc;
   }, {});
+  
+  const handleAddToCart = (product, quantity) => {
+    setCartItems((prevCartItems) => {
+      const existingProduct = prevCartItems.find((item) => item.id === product.id);
+  
+      if (existingProduct) {
+        return prevCartItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity, total: (item.quantity + quantity) * item.price }
+            : item
+        );
+      } else {
+        return [...prevCartItems, { ...product, quantity, total: product.price * quantity }];
+      }
+    });
+  };  
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   return (
-    <div className="bg-[#fffffc] p-6">
+    <div className="bg-[#fffffc] p-6 overflow-x-hidden">
       <h1 className="text-[#19535f] text-2xl font-bold mb-6">Productos</h1>
       <div className="flex flex-col gap-8">
-        {Object.entries(categorizedProducts).map(([categoryId, categoryProducts]) => (
-          <CategoryCarousel key={categoryId} products={categoryProducts} categoryId={categoryId} />
-        ))}
+        {Object.entries(categorizedProducts).map(
+          ([categoryName, categoryProducts]) => (
+            <CategoryCarousel
+              key={categoryName}
+              products={categoryProducts}
+              categoryName={categoryName}
+              handleAddToCart={handleAddToCart}  
+            />
+          )
+        )}
+      </div>
+      <div className="mt-6">
+        <h2 className="text-[#19535f] text-xl font-semibold">Carrito de Compras</h2>
+        {cartItems.length > 0 ? (
+          <ul>
+            {cartItems.map((item) => (
+              <li key={item.id} className="flex justify-between items-center">
+                <span>{item.name} x{item.quantity}</span>
+                <span>${item.total.toFixed(2)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No hay productos en el carrito.</p>
+        )}
       </div>
     </div>
   );
 };
 
-const CategoryCarousel = ({ products, categoryId }) => {
+const CategoryCarousel = ({ products, categoryName, handleAddToCart }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef(null);
 
@@ -49,12 +98,14 @@ const CategoryCarousel = ({ products, categoryId }) => {
 
   return (
     <div className="relative">
-      <h2 className="text-[#19535f] text-xl font-semibold mb-4">Categoría {categoryId}</h2>
+      <h2 className="text-[#ff7f11] text-xl font-semibold mb-4">
+        Categoría: {categoryName}
+      </h2>
       <div className="relative flex items-center">
         <button
           onClick={handlePrevious}
           className="absolute left-0 z-10 bg-[#cbe896] p-2 rounded-full shadow-lg text-[#19535f] hover:bg-[#beb7a4] transition"
-          style={{ marginLeft: "-40px" }}
+          style={{ marginLeft: "-20px" }}
         >
           <AiOutlineLeft size={20} />
         </button>
@@ -64,14 +115,18 @@ const CategoryCarousel = ({ products, categoryId }) => {
             style={{ transform: `translateX(-${currentIndex * 220}px)` }}
           >
             {products.map((product) => (
-              <Card key={product.id} product={product} />
+              <Card
+                key={product.id}
+                product={product}
+                handleAddToCart={handleAddToCart} 
+              />
             ))}
           </div>
         </div>
         <button
           onClick={handleNext}
           className="absolute right-0 z-10 bg-[#cbe896] p-2 rounded-full shadow-lg text-[#19535f] hover:bg-[#beb7a4] transition"
-          style={{ marginRight: "-40px" }}
+          style={{ marginRight: "-20px" }}
         >
           <AiOutlineRight size={20} />
         </button>
@@ -80,9 +135,10 @@ const CategoryCarousel = ({ products, categoryId }) => {
   );
 };
 
-const Card = ({ product }) => {
+const Card = ({ product, handleAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState("");
+  const base_api_url = import.meta.env.VITE_BASE_API_URL;
 
   const schema = Yup.number()
     .min(1, "Debe pedir al menos 1 unidad.")
@@ -95,22 +151,33 @@ const Card = ({ product }) => {
 
     try {
       await schema.validate(value);
-      setError(""); 
+      setError("");
     } catch (validationError) {
-      setError(validationError.message);r
+      setError(validationError.message);
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCartLocal = () => {
     if (!error && quantity >= 1) {
-      alert(`Agregaste ${quantity} de ${product.name} al carrito.`);
+      handleAddToCart(product, quantity); // Pasa la cantidad seleccionada
     }
-  };
+  };  
 
   return (
-    <div className="flex-shrink-0 w-[220px] h-[340px] mx-2 bg-[#fffffc] border border-[#beb7a4] rounded-lg shadow-lg overflow-hidden group">
+    <div className="flex-shrink-0 w-[220px] h-[340px] mx-8 bg-[#fffffc] border border-[#beb7a4] rounded-lg shadow-lg overflow-hidden group">
       <div className="relative h-[215px] bg-[#cbe896] overflow-hidden group-hover:h-[155px] transition-all duration-700">
-        <div className="h-full w-full bg-[#beb7a4] group-hover:translate-y-[-0px] transition-transform duration-700"></div>
+        <div className="h-full w-full bg-[#beb7a4] group-hover:translate-y-[-0px] transition-transform duration-700">
+          {product.photo ? (
+            <img
+              src={base_api_url + `/${product.photo}`}
+              alt={product.photo}
+              className="w-full h-full object-cover object-top"
+              width={40}
+            />
+          ) : (
+            "No image"
+          )}
+        </div>
       </div>
       <div className="p-4 h-[180px] flex flex-col justify-between">
         <div>
@@ -120,7 +187,9 @@ const Card = ({ product }) => {
         <div className="hidden group-hover:block mt-2">
           <div className="flex justify-between text-md text-[#19535f]">
             <p>Stock: {product.stock}</p>
-            <p className="text-[#ff7f11] font-bold text-md">Q{product.price.toFixed(2)}</p>
+            <p className="text-[#ff7f11] font-bold text-md">
+              Q{product.price.toFixed(2)}
+            </p>
           </div>
           <input
             type="number"
@@ -133,8 +202,8 @@ const Card = ({ product }) => {
           />
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           <button
-            onClick={handleAddToCart}
-            className="mt-2 w-full py-1 text-sm bg-[#ff7f11] text-white rounded-lg hover:bg-[#ff1b1c] transition"
+            onClick={handleAddToCartLocal}
+            className="mt-2 w-full py-1 text-sm bg-[#19535f] text-white rounded-lg hover:bg-[#ff1b1c] transition"
             disabled={!!error}
           >
             Agregar Producto

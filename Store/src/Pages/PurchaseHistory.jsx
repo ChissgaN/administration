@@ -1,60 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TablePagination } from "@mui/material";
 import OrderDetails from "../Components/OrderDetails";
 import ActionButtons from "../Components/ActionButtons";
 import { FaEye, FaEdit } from "react-icons/fa";
-
-const orders = [
-  {
-    id: 1,
-    full_name: "Gallo Clovis",
-    address: "PO Box 13454",
-    phone_number: "215-634-1334",
-    email: "cgallo@time.com",
-    delivery_date: "2024-09-21",
-    total_order: 6505.92,
-    status: 2, 
-    order_details: [
-      {
-        id: 33,
-        product_id: 8,
-        quantity: 9,
-        price: 491.65,
-        subtotal: 4729.21,
-        product: { name: "emin" },
-      },
-      {
-        id: 34,
-        product_id: 9,
-        quantity: 5,
-        price: 355.34,
-        subtotal: 1776.71,
-        product: { name: "nisi" },
-      },
-    ],
-  },
-];
+import { allOrders } from "../libs/axios/orders/allOrders";
+import { findOrder } from "../libs/axios/orders/findOrder"; 
 
 export default function PurchaseHistory() {
+  const [orders, setOrders] = useState([]); // Lista de órdenes
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [dropdownOrderId, setDropdownOrderId] = useState(null);
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(3);
 
-  const handleView = (order) => {
-    setSelectedOrder(order);
-    setIsModalOpen(true);
-  };
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const ordersData = await allOrders(); 
+        setOrders(ordersData);
+      } catch (error) {
+        console.error("Error al obtener órdenes:", error.message);
+      }
+    };
 
-  const toggleDropdown = (orderId) => {
-    setDropdownOrderId((prev) => (prev === orderId ? null : orderId));
-  };
+    fetchOrders();
+  }, []);
 
-  const handleStatusChange = (orderId, newStatus) => {
-    console.log(`Order ID: ${orderId}, New Status: ${newStatus}`);
-    setDropdownOrderId(null);
+  const handleView = async (order) => {
+    try {
+      const orderDetails = await findOrder(order.id);
+      setSelectedOrder(orderDetails);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error al obtener detalles de la orden:", error.message);
+    }
   };
 
   const handleCloseModal = () => {
@@ -67,7 +46,7 @@ export default function PurchaseHistory() {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 3));
+    setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
@@ -86,9 +65,6 @@ export default function PurchaseHistory() {
           <tr className="bg-[#9381ff]">
             <th className="p-2">ID</th>
             <th className="p-2">Estado</th>
-            <th className="p-2">Nombre</th>
-            <th className="p-2">Teléfono</th>
-            <th className="p-2">Email</th>
             <th className="p-2">Total Orden</th>
             <th className="p-2">Acciones</th>
           </tr>
@@ -97,24 +73,13 @@ export default function PurchaseHistory() {
           {paginatedOrders.map((order) => (
             <tr key={order.id}>
               <td className="p-2 text-center">{order.id}</td>
-              <td
-                className={`p-2 text-center
-    ${order.status === 1 ? "text-[#ed217c]" : ""}
-    ${order.status === 2 ? "text-blue-600" : ""}
-    ${order.status === 3 ? "text-green-600" : ""}
-    ${![1, 2, 3].includes(order.status) ? "text-gray-600" : ""}
-    rounded-full px-4 py-2 font-medium`}
-              >
-                {{
-                  1: "Pendiente",
-                  2: "En Proceso",
-                  3: "Entregado",
-                }[order.status] || "Desconocido"}
+              <td className="p-2 text-center">
+                {order.status === 1
+                  ? "Pendiente"
+                  : order.status === 2
+                  ? "En Proceso"
+                  : "Entregado"}
               </td>
-
-              <td className="p-2 text-center">{order.full_name}</td>
-              <td className="p-2 text-center">{order.phone_number}</td>
-              <td className="p-2 text-center">{order.email}</td>
               <td className="p-2 text-center">
                 Q{order.total_order.toFixed(2)}
               </td>
@@ -126,40 +91,10 @@ export default function PurchaseHistory() {
                       icon: <FaEye className="text-green-700" />,
                       className: "hover:bg-green-100",
                       tooltip: "Ver",
-                      action: handleView,
-                    },
-                    {
-                      icon: <FaEdit className="text-blue-500" />,
-                      className: "hover:bg-blue-100",
-                      tooltip: "Estado",
-                      action: () => toggleDropdown(order.id),
+                      action: () => handleView(order),
                     },
                   ]}
                 />
-                {dropdownOrderId === order.id && (
-                  <div className="absolute top-10 left-0 bg-white border border-gray-300 shadow-lg z-10 w-40 rounded-md">
-                    <ul className="divide-y divide-gray-200">
-                      <li
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleStatusChange(order.id, 1)}
-                      >
-                        Pendiente
-                      </li>
-                      <li
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleStatusChange(order.id, 2)}
-                      >
-                        En proceso
-                      </li>
-                      <li
-                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleStatusChange(order.id, 3)}
-                      >
-                        Entregado
-                      </li>
-                    </ul>
-                  </div>
-                )}
               </td>
             </tr>
           ))}

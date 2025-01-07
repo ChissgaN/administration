@@ -155,7 +155,7 @@ export default function CreateUser({ open, onClose, onCreate }) {
           />
 
           <Controller
-            // ocupa dos columnas
+
             name="comertial_name"
             control={control}
             render={({ field, fieldState }) => (
@@ -194,7 +194,7 @@ export default function CreateUser({ open, onClose, onCreate }) {
             Cancelar
           </Button>
           <Button type="submit" variant="contained" color="primary">
-            Crear Producto
+            Crear Usuario
           </Button>
         </DialogActions>
       </form>

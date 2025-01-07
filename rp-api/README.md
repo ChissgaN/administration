@@ -16,14 +16,14 @@ Dependecies: multer, express, dotenv, boom, joi, jwt, bcrypt
         {
             "products_id": 1,
             "quantity": 2,
-            "price": 10.99,
-            "subtotal": 30
+            "price": 10.00,
+            "subtotal": 20.00
         },
         {
             "products_id": 2,
             "quantity": 1,
             "price": 20.99,
-            "subtotal": 10.99
+            "subtotal": 20.99
         }
     ]
 }

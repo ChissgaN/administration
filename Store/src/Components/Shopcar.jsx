@@ -1,86 +1,127 @@
 import React, { useState } from "react";
-import { AiOutlineShoppingCart, AiOutlineClose } from "react-icons/ai";
+import { AiOutlineDelete } from "react-icons/ai";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Typography,
+  TablePagination,
+} from "@mui/material";
 
-const ShopCar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([]);
-  const [total, setTotal] = useState(0);
+const ShopCar = ({ cartItems }) => {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(2);
 
-  // Función para abrir y cerrar el modal
-  const toggleModal = () => {
-    setIsOpen(!isOpen);
+  const handleCreateOrder = () => {
+    console.log("Orden creada");
   };
 
-  // Función para cancelar el carrito
-  const cancelCart = () => {
-    setCartItems([]);
-    setTotal(0);
-    toggleModal();
+  const handleCancelOrder = () => {
+    localStorage.removeItem("cart"); 
+    window.location.reload(); 
   };
+
+  const base_api_url = import.meta.env.VITE_BASE_API_URL;
+
+  const totalOrder = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const displayedItems = cartItems.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-    <>
-      {/* Icono de carrito */}
-      <button
-        onClick={toggleModal}
-        className="text-[#19535f] hover:text-[#ff7f11] transition text-2xl"
-      >
-        <AiOutlineShoppingCart />
-      </button>
-
-      {/* Modal */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-          <div className="relative bg-[#fffffc] p-6 rounded-lg shadow-lg w-11/12 sm:w-3/5 lg:w-2/5">
-            {/* Botón de cerrar */}
-            <button
-              onClick={toggleModal}
-              className="absolute top-4 right-4 text-[#ff1b1c] hover:text-[#ff7f11] transition text-2xl"
-            >
-              <AiOutlineClose />
-            </button>
-
-            {/* Contenido del carrito */}
-            <h2 className="text-xl font-semibold text-[#19535f] mb-4">Carrito de Compras</h2>
-            {cartItems.length > 0 ? (
-              <ul className="space-y-4">
-                {cartItems.map((item, index) => (
-                  <li
-                    key={index}
-                    className="flex justify-between items-center text-[#19535f] border-b pb-2"
-                  >
-                    <span>{item.name}</span>
-                    <span>Q{item.price}</span>
-                  </li>
+    <div className="bg-[#fffffc] p-6 rounded-lg">
+      {cartItems.length === 0 ? (
+        <div className="text-center text-gray-500">
+          <p>No hay productos en tu carrito.</p>
+        </div>
+      ) : (
+        <div>
+          <h1 className="text-2xl font-bold text-[#19535f] mb-4">Productos en tu carrito</h1>
+          <TableContainer component={Paper} className="rounded-lg shadow-lg">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">ID</TableCell>
+                  <TableCell align="center">Imagen</TableCell>
+                  <TableCell align="center">Nombre</TableCell>
+                  <TableCell align="center">Cantidad</TableCell>
+                  <TableCell align="center">Precio</TableCell>
+                  <TableCell align="center">Subtotal</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {displayedItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell align="center">{item.id}</TableCell>
+                    <TableCell align="center">
+                      {item.photo ? (
+                        <img
+                          src={`${base_api_url}/${item.photo}`}
+                          alt={`Producto ${item.products_id}`}
+                          className="w-16 h-16 object-cover mx-auto"
+                        />
+                      ) : (
+                        "No image"
+                      )}
+                    </TableCell>
+                    <TableCell align="center">{item.name}</TableCell>
+                    <TableCell align="center">{item.quantity}</TableCell>
+                    <TableCell align="center">${item.price.toFixed(2)}</TableCell>
+                    <TableCell align="center">
+                      ${(item.price * item.quantity).toFixed(2)}
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </ul>
-            ) : (
-              <p className="text-center text-[#beb7a4]">Tu carrito está vacío</p>
-            )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-            {/* Total y botones */}
-            <div className="mt-6 flex justify-between items-center">
-              <div>
-                <p className="text-[#19535f] font-semibold">Total: Q{total}</p>
-              </div>
-              <div className="flex gap-4">
-                <button
-                  onClick={cancelCart}
-                  className="bg-[#ff1b1c] text-white px-4 py-2 rounded hover:bg-[#ff7f11] transition"
-                >
-                  Cancelar
-                </button>
-                <button
-                  className="bg-[#19535f] text-white px-4 py-2 rounded hover:bg-[#ff7f11] transition"
-                >
-                  Realizar Pedido
-                </button>
-              </div>
+          {/* Total y botones */}
+          <div className="flex justify-between items-center mt-4">
+            <Typography variant="h6" color="primary">
+              Total: ${totalOrder.toFixed(2)}
+            </Typography>
+            <div className="flex gap-4">
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleCancelOrder}
+                className=" hover:bg-[#]"
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleCreateOrder}
+                className=" hover:bg-[#19535f]"
+              >
+                Crear orden
+              </Button>
             </div>
           </div>
+
+          {/* Paginación */}
+          <TablePagination
+            rowsPerPageOptions={[2]} 
+            component="div"
+            count={cartItems.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            labelRowsPerPage=""
+          />
         </div>
       )}
-    </>
+    </div>
   );
 };
 
