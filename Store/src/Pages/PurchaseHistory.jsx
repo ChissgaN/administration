@@ -73,12 +73,10 @@ export default function PurchaseHistory() {
           {paginatedOrders.map((order) => (
             <tr key={order.id}>
               <td className="p-2 text-center">{order.id}</td>
-              <td className="p-2 text-center">
-                {order.status === 1
-                  ? "Pendiente"
-                  : order.status === 2
-                  ? "En Proceso"
-                  : "Entregado"}
+              <td
+                className={`text-center p-2 ${statusColor[order.status.id] || statusColor.default} rounded-full font-medium`}
+              >
+                {order.status.name}
               </td>
               <td className="p-2 text-center">
                 Q{order.total_order.toFixed(2)}
@@ -122,3 +120,10 @@ export default function PurchaseHistory() {
     </div>
   );
 }
+
+const statusColor = {
+  "5": "text-[#ed217c]",
+  "3": "text-blue-600",
+  "4": "text-green-600",
+  "default": "text-gray-600",
+};

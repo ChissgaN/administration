@@ -221,7 +221,7 @@ const Navbar = ({ rol_id }) => {
         aria-describedby="cart-modal-description"
       >
         <div
-          className="bg-white p-6 rounded-lg shadow-lg w-2/4 h-3/3 mx-auto mt-20"
+          className="bg-white p-6 rounded-lg shadow-lg w-2/4 h-3/3 mx-auto mt-10"
         >
           <ShopCar cartItems={cartItems} />
         </div>

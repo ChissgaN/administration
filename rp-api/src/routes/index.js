@@ -30,7 +30,7 @@ export function routes(app) {
   app_router.use("/roles", auth, role_router);
   app_router.use("/users", auth, user_router);
   app_router.use("/order", auth, order_router);
-  // app_router.use("/client", auth, client_router);
+  //app_router.use("/client", auth, client_router);
 }
 
 export default routes;

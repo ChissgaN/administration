@@ -1,43 +1,108 @@
-import React, { useState } from "react";
-import { AiOutlineDelete } from "react-icons/ai";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Typography,
-  TablePagination,
-} from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { createOrder } from "../libs/axios/orders/CreateOrders"; 
+import { getProfile } from "../libs/axios/auth/getProfile"; 
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import Pagination from "@mui/material/Pagination";
 
 const ShopCar = ({ cartItems }) => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage] = useState(2);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Para la paginación
+  const [formData, setFormData] = useState({
+    full_name: "",
+    address: "",
+    delivery_date: "",
+  });
 
-  const handleCreateOrder = () => {
-    console.log("Orden creada");
+  const itemsPerPage = 2; // Mostrar solo 2 productos por página
+  const base_api_url = import.meta.env.VITE_BASE_API_URL;
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const profile = await getProfile();
+        setUser(profile);
+      } catch (err) {
+        setError("No se pudo obtener la información del usuario.");
+      }
+    };
+    fetchUserProfile();
+  }, []);
+
+  const handleCreateOrder = async () => {
+    if (!user) {
+      setError("Por favor, inicia sesión para crear una orden.");
+      return;
+    }
+
+    const totalOrder = cartItems.reduce(
+      (acc, item) => acc + item.price * item.quantity, 
+      0
+    ).toFixed(2);
+
+    const order = {
+      full_name: formData.full_name || user.name,
+      address: formData.address || user.address,
+      delivery_date: formData.delivery_date,
+      phone_number: user.phone_number,
+      email: user.email,
+      status_id: 3,
+      total_order: totalOrder, 
+      order_details: cartItems.map((item) => ({
+        products_id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        subtotal: item.price * item.quantity,
+      })),
+    };
+
+    try {
+      setLoading(true);
+      const { status, data } = await createOrder(order);
+      if (status === 200) {
+        alert("Orden creada con éxito");
+        localStorage.removeItem("cart");
+        window.location.reload();
+      } else {
+        console.error("Detalles del error:", data);
+        setError("Hubo un error al crear la orden.");
+      }
+    } catch (err) {
+      console.error("Error del servidor:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Hubo un error al crear la orden.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancelOrder = () => {
-    localStorage.removeItem("cart"); 
-    window.location.reload(); 
+    localStorage.removeItem("cart");
+    window.location.reload();
   };
 
-  const base_api_url = import.meta.env.VITE_BASE_API_URL;
-
-  const totalOrder = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChangePage = (_, page) => {
+    setCurrentPage(page);
   };
 
-  const displayedItems = cartItems.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const displayedItems = cartItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalAmount = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity, 
+    0
+  ).toFixed(2);
 
   return (
     <div className="bg-[#fffffc] p-6 rounded-lg">
+      {error && <p className="text-red-500">{error}</p>}
       {cartItems.length === 0 ? (
         <div className="text-center text-gray-500">
           <p>No hay productos en tu carrito.</p>
@@ -45,6 +110,31 @@ const ShopCar = ({ cartItems }) => {
       ) : (
         <div>
           <h1 className="text-2xl font-bold text-[#19535f] mb-4">Productos en tu carrito</h1>
+          <div className="flex justify-between gap-4 mb-6">
+            <input
+              type="text"
+              name="full_name"
+              placeholder="Nombre completo"
+              value={formData.full_name}
+              onChange={handleInputChange}
+              className="border rounded-lg p-2 w-full"
+            />
+            <input
+              type="text"
+              name="address"
+              placeholder="Dirección"
+              value={formData.address}
+              onChange={handleInputChange}
+              className="border rounded-lg p-2 w-full"
+            />
+            <input
+              type="date"
+              name="delivery_date"
+              value={formData.delivery_date}
+              onChange={handleInputChange}
+              className="border rounded-lg p-2 w-full"
+            />
+          </div>
           <TableContainer component={Paper} className="rounded-lg shadow-lg">
             <Table>
               <TableHead>
@@ -83,42 +173,30 @@ const ShopCar = ({ cartItems }) => {
               </TableBody>
             </Table>
           </TableContainer>
-
-          {/* Total y botones */}
+          <Pagination
+            count={Math.ceil(cartItems.length / itemsPerPage)}
+            page={currentPage}
+            onChange={handleChangePage}
+            className="mt-4"
+          />
           <div className="flex justify-between items-center mt-4">
-            <Typography variant="h6" color="primary">
-              Total: ${totalOrder.toFixed(2)}
-            </Typography>
+            <p>Total: ${totalAmount}</p>
             <div className="flex gap-4">
-              <Button
-                variant="contained"
-                color="error"
+              <button
                 onClick={handleCancelOrder}
-                className=" hover:bg-[#]"
+                className="py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
               >
                 Cancelar
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
+              </button>
+              <button
                 onClick={handleCreateOrder}
-                className=" hover:bg-[#19535f]"
+                className="py-2 px-4 bg-[#19535f] text-white rounded-lg hover:bg-[#ff1b1c] transition"
+                disabled={loading}
               >
-                Crear orden
-              </Button>
+                {loading ? "Creando orden..." : "Crear orden"}
+              </button>
             </div>
           </div>
-
-          {/* Paginación */}
-          <TablePagination
-            rowsPerPageOptions={[2]} 
-            component="div"
-            count={cartItems.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            labelRowsPerPage=""
-          />
         </div>
       )}
     </div>

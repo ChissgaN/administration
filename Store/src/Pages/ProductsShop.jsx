@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import productAPI from "../libs/axios/products";
 
 const ProductsShop = () => {
-  const [cartItems, setCartItems] = useState([]);  // Estado local del carrito
+  const [cartItems, setCartItems] = useState([]);
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -159,7 +159,7 @@ const Card = ({ product, handleAddToCart }) => {
 
   const handleAddToCartLocal = () => {
     if (!error && quantity >= 1) {
-      handleAddToCart(product, quantity); // Pasa la cantidad seleccionada
+      handleAddToCart(product, quantity); 
     }
   };  
 
