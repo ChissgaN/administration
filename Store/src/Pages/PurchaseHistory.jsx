@@ -65,6 +65,7 @@ export default function PurchaseHistory() {
           <tr className="bg-[#9381ff]">
             <th className="p-2">ID</th>
             <th className="p-2">Estado</th>
+            <th className="p-2">Fecha de Entrega</th>
             <th className="p-2">Total Orden</th>
             <th className="p-2">Acciones</th>
           </tr>
@@ -78,6 +79,7 @@ export default function PurchaseHistory() {
               >
                 {order.status.name}
               </td>
+              <td className="p-2 text-center">{order.delivery_date}</td>
               <td className="p-2 text-center">
                 Q{order.total_order.toFixed(2)}
               </td>

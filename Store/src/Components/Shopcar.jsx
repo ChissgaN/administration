@@ -180,7 +180,7 @@ const ShopCar = ({ cartItems }) => {
             className="mt-4"
           />
           <div className="flex justify-between items-center mt-4">
-            <p>Total: ${totalAmount}</p>
+            <p className="text-xl text-[#ed217c] font-bold">Total: ${totalAmount}</p>
             <div className="flex gap-4">
               <button
                 onClick={handleCancelOrder}
@@ -190,7 +190,7 @@ const ShopCar = ({ cartItems }) => {
               </button>
               <button
                 onClick={handleCreateOrder}
-                className="py-2 px-4 bg-[#19535f] text-white rounded-lg hover:bg-[#ff1b1c] transition"
+                className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-[#ed217c] transition disabled:bg-gray-400 disabled:text-gray-500"
                 disabled={loading}
               >
                 {loading ? "Creando orden..." : "Crear orden"}
