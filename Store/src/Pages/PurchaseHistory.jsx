@@ -7,7 +7,7 @@ import { allOrders } from "../libs/axios/orders/allOrders";
 import { findOrder } from "../libs/axios/orders/findOrder"; 
 
 export default function PurchaseHistory() {
-  const [orders, setOrders] = useState([]); // Lista de órdenes
+  const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(0);

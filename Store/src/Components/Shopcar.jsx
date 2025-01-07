@@ -8,14 +8,14 @@ const ShopCar = ({ cartItems }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1); // Para la paginación
+  const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
     full_name: "",
     address: "",
     delivery_date: "",
   });
 
-  const itemsPerPage = 2; // Mostrar solo 2 productos por página
+  const itemsPerPage = 2; 
   const base_api_url = import.meta.env.VITE_BASE_API_URL;
 
   useEffect(() => {
