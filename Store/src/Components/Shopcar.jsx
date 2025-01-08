@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { createOrder } from "../libs/axios/orders/CreateOrders"; 
-import { getProfile } from "../libs/axios/auth/getProfile"; 
+import * as yup from "yup";
+import { createOrder } from "../libs/axios/orders/CreateOrders";
+import { getProfile } from "../libs/axios/auth/getProfile";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 
@@ -8,6 +9,7 @@ const ShopCar = ({ cartItems }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
     full_name: "",
@@ -15,8 +17,17 @@ const ShopCar = ({ cartItems }) => {
     delivery_date: "",
   });
 
-  const itemsPerPage = 2; 
+  const itemsPerPage = 2;
   const base_api_url = import.meta.env.VITE_BASE_API_URL;
+
+  const validationSchema = yup.object().shape({
+    full_name: yup.string().trim().required("El nombre completo es requerido."),
+    address: yup.string().trim().required("La dirección es requerida."),
+    delivery_date: yup
+      .date()
+      .required("La fecha de entrega es requerida.")
+      .min(new Date(), "La fecha de entrega no puede ser anterior a hoy."),
+  });
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -30,14 +41,32 @@ const ShopCar = ({ cartItems }) => {
     fetchUserProfile();
   }, []);
 
+  const validateForm = async () => {
+    try {
+      await validationSchema.validate(formData, { abortEarly: false });
+      setFormErrors({});
+      return true;
+    } catch (err) {
+      const errors = {};
+      err.inner.forEach((validationError) => {
+        errors[validationError.path] = validationError.message;
+      });
+      setFormErrors(errors);
+      return false;
+    }
+  };
+
   const handleCreateOrder = async () => {
+    const isValid = await validateForm();
+    if (!isValid) return;
+
     if (!user) {
       setError("Por favor, inicia sesión para crear una orden.");
       return;
     }
 
     const totalOrder = cartItems.reduce(
-      (acc, item) => acc + item.price * item.quantity, 
+      (acc, item) => acc + item.price * item.quantity,
       0
     ).toFixed(2);
 
@@ -48,7 +77,7 @@ const ShopCar = ({ cartItems }) => {
       phone_number: user.phone_number,
       email: user.email,
       status_id: 3,
-      total_order: totalOrder, 
+      total_order: totalOrder,
       order_details: cartItems.map((item) => ({
         products_id: item.id,
         quantity: item.quantity,
@@ -93,7 +122,7 @@ const ShopCar = ({ cartItems }) => {
   );
 
   const totalAmount = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity, 
+    (acc, item) => acc + item.price * item.quantity,
     0
   ).toFixed(2);
 
@@ -108,29 +137,38 @@ const ShopCar = ({ cartItems }) => {
         <div>
           <h1 className="text-2xl font-bold text-[#19535f] mb-4">Productos en tu carrito</h1>
           <div className="flex justify-between gap-4 mb-6">
-            <input
-              type="text"
-              name="full_name"
-              placeholder="Nombre completo"
-              value={formData.full_name}
-              onChange={handleInputChange}
-              className="border rounded-lg p-2 w-full"
-            />
-            <input
-              type="text"
-              name="address"
-              placeholder="Dirección"
-              value={formData.address}
-              onChange={handleInputChange}
-              className="border rounded-lg p-2 w-full"
-            />
-            <input
-              type="date"
-              name="delivery_date"
-              value={formData.delivery_date}
-              onChange={handleInputChange}
-              className="border rounded-lg p-2 w-full"
-            />
+            <div className="w-full">
+              <input
+                type="text"
+                name="full_name"
+                placeholder="Nombre completo"
+                value={formData.full_name}
+                onChange={handleInputChange}
+                className="border rounded-lg p-2 w-full"
+              />
+              {formErrors.full_name && <p className="text-red-500 text-sm">{formErrors.full_name}</p>}
+            </div>
+            <div className="w-full">
+              <input
+                type="text"
+                name="address"
+                placeholder="Dirección"
+                value={formData.address}
+                onChange={handleInputChange}
+                className="border rounded-lg p-2 w-full"
+              />
+              {formErrors.address && <p className="text-red-500 text-sm">{formErrors.address}</p>}
+            </div>
+            <div className="w-full">
+              <input
+                type="date"
+                name="delivery_date"
+                value={formData.delivery_date}
+                onChange={handleInputChange}
+                className="border rounded-lg p-2 w-full"
+              />
+              {formErrors.delivery_date && <p className="text-red-500 text-sm">{formErrors.delivery_date}</p>}
+            </div>
           </div>
           <TableContainer component={Paper} className="rounded-lg shadow-lg">
             <Table>

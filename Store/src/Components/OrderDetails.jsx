@@ -7,13 +7,10 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 export default function OrderDetails({ open, onClose, order_id }) {
 
   const [order, setOrder] = useState({});
-
-  // Calcular el total de la orden
   const totalOrder = order?.order_details?.reduce(
     (total, item) => total + item.subtotal,
     0
   );
-
 
   useEffect(() => {
     findOrder(order_id).then((response) => {
@@ -24,7 +21,6 @@ export default function OrderDetails({ open, onClose, order_id }) {
       });
 
   }, [order_id]);
-
 
   return (
     <Dialog
@@ -45,7 +41,7 @@ export default function OrderDetails({ open, onClose, order_id }) {
         </div>
       </DialogTitle>
       <DialogContent>
-        {/* Información general de la orden */}
+        
         <div className="flex justify-between mb-4 text-[#19535f] text-lg">
           <div>
             <p><strong>ID:</strong> {order?.id}</p>

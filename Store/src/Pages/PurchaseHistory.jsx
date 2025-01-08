@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { TablePagination } from "@mui/material";
 import OrderDetails from "../Components/OrderDetails";
 import ActionButtons from "../Components/ActionButtons";
-import { FaEye, FaEdit } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { allOrders } from "../libs/axios/orders/allOrders";
 import { findOrder } from "../libs/axios/orders/findOrder"; 
 
 export default function PurchaseHistory() {
   const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(3);
@@ -26,19 +26,14 @@ export default function PurchaseHistory() {
     fetchOrders();
   }, []);
 
-  const handleView = async (order) => {
-    try {
-      const orderDetails = await findOrder(order.id);
-      setSelectedOrder(orderDetails);
-      setIsModalOpen(true);
-    } catch (error) {
-      console.error("Error al obtener detalles de la orden:", error.message);
-    }
+  const handleView = (order) => {
+    setSelectedOrderId(order.id);
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedOrder(null);
+    setSelectedOrderId(null);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -112,11 +107,11 @@ export default function PurchaseHistory() {
         rowsPerPageOptions={[3, 5, 10]}
       />
 
-      {selectedOrder && (
+      {selectedOrderId && (
         <OrderDetails
           open={isModalOpen}
           onClose={handleCloseModal}
-          order={selectedOrder}
+          order_id={selectedOrderId}
         />
       )}
     </div>
