@@ -69,10 +69,12 @@ export default function Categories() {
   const handleDeleteClick = (category) => {
     setSelectedCategory(category);
     setIsConfirmOpen(true);
+    
   };
 
   const handleConfirmDelete = () => {
     c.deleteCategory(selectedCategory.id)
+    window.location.reload()
       .then((response) => {
         if (response.status === 204) {
           getCategories();

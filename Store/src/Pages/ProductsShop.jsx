@@ -63,21 +63,6 @@ const ProductsShop = () => {
           )
         )}
       </div>
-      <div className="mt-6">
-        <h2 className="text-[#19535f] text-xl font-semibold">Carrito de Compras</h2>
-        {cartItems.length > 0 ? (
-          <ul>
-            {cartItems.map((item) => (
-              <li key={item.id} className="flex justify-between items-center">
-                <span>{item.name} x{item.quantity}</span>
-                <span>${item.total.toFixed(2)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No hay productos en el carrito.</p>
-        )}
-      </div>
     </div>
   );
 };

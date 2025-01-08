@@ -61,15 +61,12 @@ const ShopCar = ({ cartItems }) => {
       setLoading(true);
       const { status, data } = await createOrder(order);
       if (status === 200) {
-        alert("Orden creada con éxito");
         localStorage.removeItem("cart");
         window.location.reload();
       } else {
-        console.error("Detalles del error:", data);
         setError("Hubo un error al crear la orden.");
       }
     } catch (err) {
-      console.error("Error del servidor:", err.response?.data || err.message);
       setError(err.response?.data?.message || "Hubo un error al crear la orden.");
     } finally {
       setLoading(false);

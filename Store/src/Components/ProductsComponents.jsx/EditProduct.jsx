@@ -60,10 +60,9 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
 
   const onSubmit = (data) => {
     
-    const { status, category, ...rest } = data; // delete status and category from validation 
+    const { status, category, ...rest } = data; 
 
-    const updatedData = Object.entries(rest).reduce((acc, [key, value]) => { // iterate over the rest of the data and check if the value is different from the original value in productData and add it to the acc object
-
+    const updatedData = Object.entries(rest).reduce((acc, [key, value]) => { 
       if (key === "photo" && value instanceof File) {
         acc[key] = value;
       } else {
@@ -98,9 +97,10 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 >
-                  <MenuItem value="1">Electrodomésticos</MenuItem>
-                  <MenuItem value="2">Ropa</MenuItem>
-                  <MenuItem value="3">Zapatos</MenuItem>
+                  <MenuItem value="1">Comestibles</MenuItem>
+                  <MenuItem value="2">Higuiene</MenuItem>
+                  <MenuItem value="3">Mascotas</MenuItem>
+                  <MenuItem value="4">Accesorios</MenuItem>
                 </TextField>
               )}
             />

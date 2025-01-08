@@ -11,11 +11,29 @@ import { yupResolver } from "@hookform/resolvers/yup";
 const schema = yup.object().shape({
   role_id: yup.string().required("El rol es requerido."),
   email: yup.string().email().required("Debes ingresar un correo válido."),
-  password: yup.string().min(6).required("La contraseña es requerida."),
-  phone_number: yup.string().required("El número de teléfono es requerido."),
-  birth_date: yup.string().transform((value, originalValue) => {
+  password: yup.string().min(6).required("La contraseña es requerida y debe tener al menos 6 caracteres."),
+  phone_number: yup.string().min(8).required("El número de teléfono es requerido y debe tener 8 caracteres."),
+  birth_date: yup
+  .string()
+  .transform((value, originalValue) => {
     return originalValue ? new Date(originalValue).toISOString().split('T')[0] : value;
-  }).required("La fecha de nacimiento es requerida."),
+  })
+  .required("La fecha de nacimiento es requerida.")
+  .test(
+    "is-18",
+    "Debes tener al menos 18 años.",
+    (value) => {
+      if (!value) return false; 
+      const birthDate = new Date(value);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const isMonthBefore = today.getMonth() < birthDate.getMonth();
+      const isDayBefore =
+        today.getMonth() === birthDate.getMonth() &&
+        today.getDate() < birthDate.getDate();
+      return age > 18 || (age === 18 && !isMonthBefore && !isDayBefore);
+    }
+  ),
 });
 
 export default function CreateUser({ open, onClose, onCreate }) {
