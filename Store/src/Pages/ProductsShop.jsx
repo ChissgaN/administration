@@ -11,7 +11,9 @@ const ProductsShop = () => {
     productAPI
       .getAllProducts()
       .then((data) => {
-        setProducts(data);
+        // Filtrar solo las categorías activas (status_id = 1)
+        const filteredProducts = data.filter(product => product.category?.status_id === 1);
+        setProducts(filteredProducts);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
@@ -28,7 +30,7 @@ const ProductsShop = () => {
     
     return acc;
   }, {});
-  
+
   const handleAddToCart = (product, quantity) => {
     setCartItems((prevCartItems) => {
       const existingProduct = prevCartItems.find((item) => item.id === product.id);
@@ -43,7 +45,8 @@ const ProductsShop = () => {
         return [...prevCartItems, { ...product, quantity, total: product.price * quantity }];
       }
     });
-  };  
+  };
+
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
@@ -180,9 +183,7 @@ const Card = ({ product, handleAddToCart }) => {
             type="number"
             value={quantity}
             onChange={handleQuantityChange}
-            className={`w-full mt-2 p-1 text-center border rounded-lg ${
-              error ? "border-red-500" : "border-gray-300"
-            }`}
+            className={`w-full mt-2 p-1 text-center border rounded-lg ${error ? "border-red-500" : "border-gray-300"}`}
             placeholder="Cantidad"
           />
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}

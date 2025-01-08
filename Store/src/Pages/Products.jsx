@@ -10,6 +10,10 @@ import {
   TablePagination,
   Button,
   TextField,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import ActionButtons from "../Components/ActionButtons";
@@ -30,6 +34,7 @@ export default function Products() {
   const [productToEdit, setProductToEdit] = useState(null);
   const [productos, setProductos] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [filterCategoryStatus, setFilterCategoryStatus] = useState("all");
 
   const handleEditClick = (producto) => {
     setProductToEdit(producto);
@@ -100,11 +105,17 @@ export default function Products() {
 
   useEffect(getProducts, []);
 
-  const filteredProducts = productos.filter(
-    (producto) =>
+  const filteredProducts = productos.filter((producto) => {
+    const matchesSearch =
       producto.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      producto.category.name.toLowerCase().includes(searchText.toLowerCase())
-  );
+      producto.category.name.toLowerCase().includes(searchText.toLowerCase());
+
+    const matchesStatus =
+      filterCategoryStatus === "all" ||
+      producto.category.status_id.toString() === filterCategoryStatus;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const paginatedProducts = filteredProducts.slice(
     page * rowsPerPage,
@@ -122,8 +133,20 @@ export default function Products() {
             label="Buscar por nombre o categoría"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            className="mb-4 w-[32%]  rounded"
+            className="mb-4 w-[32%] rounded"
           />
+          <FormControl variant="outlined" size="small" className="w-[30%]">
+            <InputLabel>Filtrar por estado de categoría</InputLabel>
+            <Select
+              value={filterCategoryStatus}
+              onChange={(e) => setFilterCategoryStatus(e.target.value)}
+              label="Filtrar por estado de categoría"
+            >
+              <MenuItem value="all">Todos</MenuItem>
+              <MenuItem value="1">Categorías activas</MenuItem>
+              <MenuItem value="2">Categorías inactivas</MenuItem>
+            </Select>
+          </FormControl>
           <Button
             variant="contained"
             className="bg-[#9381ff] text-white hover:bg-[#7c6bd0]  px-4 py-2 rounded-md flex items-center"

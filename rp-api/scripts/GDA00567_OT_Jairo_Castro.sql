@@ -48,7 +48,7 @@ CREATE TABLE users
     id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     role_id INT NOT NULL,
     status_id INT NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(150) NOT NULL,
     phone_number VARCHAR(45) NOT NULL,
     birth_date DATE NOT NULL,

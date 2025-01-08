@@ -195,6 +195,7 @@ export default function Users() {
         open={isCreateDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         onCreate={handleCreateUser}
+        existingEmails={users.map((user) => user.email)}
       />
       <EditUser
         open={isEditDialogOpen}
