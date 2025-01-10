@@ -61,6 +61,7 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
   const onSubmit = (data) => {
     
     const { status, category, ...rest } = data; 
+    console.log(data);
 
     const updatedData = Object.entries(rest).reduce((acc, [key, value]) => { 
       if (key === "photo" && value instanceof File) {

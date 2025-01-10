@@ -138,6 +138,7 @@ export default function Products() {
           <FormControl variant="outlined" size="small" className="w-[30%]">
             <InputLabel>Filtrar por estado de categoría</InputLabel>
             <Select
+            
               value={filterCategoryStatus}
               onChange={(e) => setFilterCategoryStatus(e.target.value)}
               label="Filtrar por estado de categoría"
