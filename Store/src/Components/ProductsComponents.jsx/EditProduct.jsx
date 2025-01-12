@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -12,6 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Dropzone from "react-dropzone";
+import { getAllCategories } from "../../libs/axios/categories";
 
 const schema = yup.object().shape({
   products_categories_id: yup.string().required("La categoría es requerida."),
@@ -32,6 +33,7 @@ const schema = yup.object().shape({
 });
 
 export default function EditProduct({ open, onClose, onSave, productData }) {
+  const [categories, setCategories] = useState([]);
   const { control, handleSubmit, setValue, getValues } = useForm({
     resolver: yupResolver(schema),
     defaultValues: productData || {
@@ -59,11 +61,11 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
   };
 
   const onSubmit = (data) => {
-    
-    const { status, category, ...rest } = data; 
+
+    const { status, category, ...rest } = data;
     console.log(data);
 
-    const updatedData = Object.entries(rest).reduce((acc, [key, value]) => { 
+    const updatedData = Object.entries(rest).reduce((acc, [key, value]) => {
       if (key === "photo" && value instanceof File) {
         acc[key] = value;
       } else {
@@ -78,6 +80,17 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
     onSave(updatedData);
     onClose();
   };
+
+  useEffect(() => {
+    getAllCategories()
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+    , []);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -98,10 +111,14 @@ export default function EditProduct({ open, onClose, onSave, productData }) {
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message}
                 >
-                  <MenuItem value="1">Comestibles</MenuItem>
-                  <MenuItem value="2">Higuiene</MenuItem>
-                  <MenuItem value="3">Mascotas</MenuItem>
-                  <MenuItem value="4">Accesorios</MenuItem>
+
+                  {
+                    categories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))
+                  }
                 </TextField>
               )}
             />
