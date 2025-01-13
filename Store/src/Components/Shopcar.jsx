@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 import * as yup from "yup";
 import { createOrder } from "../libs/axios/orders/CreateOrders";
 import { getProfile } from "../libs/axios/auth/getProfile";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 
 const ShopCar = ({ cartItems }) => {
@@ -16,6 +24,8 @@ const ShopCar = ({ cartItems }) => {
     address: "",
     delivery_date: "",
   });
+  const [cart, setCart] = useState(cartItems); // Estado local para los items del carrito
+  const [warningMessage, setWarningMessage] = useState(""); // Mensaje de advertencia
 
   const itemsPerPage = 2;
   const base_api_url = import.meta.env.VITE_BASE_API_URL;
@@ -65,7 +75,7 @@ const ShopCar = ({ cartItems }) => {
       return;
     }
 
-    const totalOrder = cartItems.reduce(
+    const totalOrder = cart.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     ).toFixed(2);
@@ -78,7 +88,7 @@ const ShopCar = ({ cartItems }) => {
       email: user.email,
       status_id: 3,
       total_order: totalOrder,
-      order_details: cartItems.map((item) => ({
+      order_details: cart.map((item) => ({
         products_id: item.id,
         quantity: item.quantity,
         price: item.price,
@@ -116,12 +126,38 @@ const ShopCar = ({ cartItems }) => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const displayedItems = cartItems.slice(
+  const handleQuantityChange = (id, newQuantity) => {
+    setCart((prevCart) => {
+      const updatedCart = prevCart.map((item) => {
+        if (item.id === id) {
+          const totalQuantity = prevCart
+            .filter((cartItem) => cartItem.id === id)
+            .reduce((acc, cartItem) => acc + cartItem.quantity, 0);
+          const remainingStock = item.stock - (totalQuantity - item.quantity);
+
+          if (newQuantity > remainingStock) {
+            setWarningMessage(
+              `La cantidad total para "${item.name}" no puede superar el stock disponible (${item.stock}).`
+            );
+            return { ...item, quantity: remainingStock };
+          }
+
+          setWarningMessage(""); // Limpiar mensaje si la cantidad es válida
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      });
+
+      return updatedCart;
+    });
+  };
+
+  const displayedItems = cart.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const totalAmount = cartItems.reduce(
+  const totalAmount = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   ).toFixed(2);
@@ -129,47 +165,16 @@ const ShopCar = ({ cartItems }) => {
   return (
     <div className="bg-[#fffffc] p-6 rounded-lg">
       {error && <p className="text-red-500">{error}</p>}
-      {cartItems.length === 0 ? (
+      {warningMessage && <p className="text-yellow-500">{warningMessage}</p>}
+      {cart.length === 0 ? (
         <div className="text-center text-gray-500">
           <p>No hay productos en tu carrito.</p>
         </div>
       ) : (
         <div>
-          <h1 className="text-2xl font-bold text-[#19535f] mb-4">Productos en tu carrito</h1>
-          <div className="flex justify-between gap-4 mb-6">
-            <div className="w-full">
-              <input
-                type="text"
-                name="full_name"
-                placeholder="Nombre completo"
-                value={formData.full_name}
-                onChange={handleInputChange}
-                className="border rounded-lg p-2 w-full"
-              />
-              {formErrors.full_name && <p className="text-red-500 text-sm">{formErrors.full_name}</p>}
-            </div>
-            <div className="w-full">
-              <input
-                type="text"
-                name="address"
-                placeholder="Dirección"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="border rounded-lg p-2 w-full"
-              />
-              {formErrors.address && <p className="text-red-500 text-sm">{formErrors.address}</p>}
-            </div>
-            <div className="w-full">
-              <input
-                type="date"
-                name="delivery_date"
-                value={formData.delivery_date}
-                onChange={handleInputChange}
-                className="border rounded-lg p-2 w-full"
-              />
-              {formErrors.delivery_date && <p className="text-red-500 text-sm">{formErrors.delivery_date}</p>}
-            </div>
-          </div>
+          <h1 className="text-2xl font-bold text-[#19535f] mb-4">
+            Productos en tu carrito
+          </h1>
           <TableContainer component={Paper} className="rounded-lg shadow-lg">
             <Table>
               <TableHead>
@@ -198,7 +203,17 @@ const ShopCar = ({ cartItems }) => {
                       )}
                     </TableCell>
                     <TableCell align="center">{item.name}</TableCell>
-                    <TableCell align="center">{item.quantity}</TableCell>
+                    <TableCell align="center">
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        min="1"
+                        onChange={(e) =>
+                          handleQuantityChange(item.id, Number(e.target.value))
+                        }
+                        className="border rounded-lg p-2 w-full text-center"
+                      />
+                    </TableCell>
                     <TableCell align="center">${item.price.toFixed(2)}</TableCell>
                     <TableCell align="center">
                       ${(item.price * item.quantity).toFixed(2)}
@@ -209,7 +224,7 @@ const ShopCar = ({ cartItems }) => {
             </Table>
           </TableContainer>
           <Pagination
-            count={Math.ceil(cartItems.length / itemsPerPage)}
+            count={Math.ceil(cart.length / itemsPerPage)}
             page={currentPage}
             onChange={handleChangePage}
             className="mt-4"
