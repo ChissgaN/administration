@@ -27,3 +27,7 @@ Dependecies: multer, express, dotenv, boom, joi, jwt, bcrypt
         }
     ]
 }
+
+# Store 
+Proyecto para el concurso, Frontend 
+Dependencies: Material Ui, Axios, Yup, React Icons, React-Hook-Form, React Router.
