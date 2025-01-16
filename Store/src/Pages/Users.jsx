@@ -44,7 +44,6 @@ export default function Users() {
         getUsers();
       })
       .catch((error) => {
-        console.error(error);
       })
       .finally(() => {
         setSelectedUser(null);
@@ -67,7 +66,6 @@ export default function Users() {
         getUsers();
       })
       .catch((error) => {
-        console.error(error);
       })
       .finally(() => {
         setSelectedUser(null);
@@ -92,7 +90,6 @@ export default function Users() {
         console.error(error);
       });
   }
-
   useEffect(getUsers, []);
 
   return (

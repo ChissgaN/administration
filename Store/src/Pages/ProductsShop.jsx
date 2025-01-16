@@ -18,7 +18,6 @@ const ProductsShop = () => {
         setProducts(filteredProducts);
       })
       .catch((error) => {
-        console.error("Error fetching products:", error);
       });
   }, []);
 
@@ -46,7 +45,6 @@ const ProductsShop = () => {
         setDialogOpen(true);
         return prevCartItems;
       }
-
       return existingProduct
         ? prevCartItems.map((item) =>
             item.id === product.id
@@ -56,7 +54,6 @@ const ProductsShop = () => {
         : [...prevCartItems, { ...product, quantity, total: product.price * quantity }];
     });
   };
-
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
